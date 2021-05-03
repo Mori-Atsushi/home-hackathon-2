@@ -1,10 +1,7 @@
 package com.example.home_hackathon2.ui.initial
 
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +17,7 @@ import com.example.home_hackathon2.ui.res.COLOR_BLACK
 import com.example.home_hackathon2.ui.res.COLOR_DARK
 import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.widget.BorderTextField
+import com.example.home_hackathon2.ui.widget.TintButton
 
 @Composable
 fun InitialScreen() {
@@ -47,16 +45,24 @@ fun InitialScreen() {
             modifier = Modifier.padding(bottom = 24.dp),
             color = COLOR_LIGHT
         )
-        NameTextField()
+        NameTextField(
+            modifier = Modifier.padding(bottom = 16.dp),
+        )
+        TintButton(
+            text = "はじめる",
+            onClick = {}
+        )
     }
 }
 
 @Composable
-private fun NameTextField() {
+private fun NameTextField(
+    modifier: Modifier = Modifier
+) {
     // TODO: 外から監視する
     var text by remember { mutableStateOf("") }
 
-    Column {
+    Column(modifier = modifier) {
         Text(
             modifier = Modifier.padding(bottom = 6.dp),
             color = COLOR_DARK,
