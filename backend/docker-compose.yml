@@ -2,6 +2,32 @@ version: "3"
 services:
   app:
     build: .
+    entrypoint:
+      - dockerize
+      - -timeout
+      - 60s
+      - -wait
+      - tcp://mysql:3306
+    environment:
+      MYSQL_DBNAME: ouchi
+      MYSQL_USER: ouchi
+      MYSQL_PASS: ouchi
+      MYSQL_HOST: mysql
+      SERVER_PORT: 5300
     ports: 
       - "5300:5300"
+    depends_on: 
+      - mysql
     command: /go/src/app/application
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/db:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ouchi
+      MYSQL_USER: ouchi
+      MYSQL_PASSWORD: ouchi
+    ports:
+      - "3306:3306"
