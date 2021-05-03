@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.grpc.ManagedChannelBuilder
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -14,6 +15,7 @@ object GrpcModule {
     private const val PORT = 8080
 
     @Provides
+    @Singleton
     fun provideAppServiceCoroutineStub(): AppServiceCoroutineStub {
         val channel = ManagedChannelBuilder
             .forAddress(HOST, PORT)
