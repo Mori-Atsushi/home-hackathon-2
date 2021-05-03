@@ -1,0 +1,50 @@
+syntax = "proto3";
+package app;
+option go_package = ".;pb";
+option java_package = "com.example.home_hackathon2.pb";
+
+service AppService {
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+    rpc ChatRoomEvent (stream ChatRoomEventRequest) returns (stream ChatRoomEventResponse);
+}
+
+message CreateUserRequest {
+    string name = 1;
+}
+
+message CreateUserResponse　{
+    UserWithAuth userWithAuth = 1;
+}
+message ChatRoomEventRequest {
+    oneof event_oneof {
+        SendChatRequest sendChatRequest = 1;
+    }
+}
+message SendChatRequest {
+    string message = 1;
+}
+
+message ChatRoomEventResponse {
+    oneof event_oneof {
+        ChatReceiveResponse chatRecieveResponse = 1;
+    }
+}
+
+message ChatReceiveResponse {
+    Chat chat = 1;
+}
+
+message Chat {
+    User user = 1;
+    string message = 2;
+}
+
+message User {
+    string id = 1;
+    string name = 2;
+}
+
+message UserWithAuth {
+    User user = 1;
+    string accessToken = 2;
+}
