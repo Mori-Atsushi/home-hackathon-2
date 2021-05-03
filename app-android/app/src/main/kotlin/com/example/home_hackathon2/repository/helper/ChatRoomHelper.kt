@@ -2,35 +2,44 @@ package com.example.home_hackathon2.repository.helper
 
 import com.example.home_hackathon2.pb.App
 import com.example.home_hackathon2.pb.AppServiceGrpcKt
+import com.example.home_hackathon2.util.ApplicationScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ChatRoomHelper @Inject constructor(
-    private val service: AppServiceGrpcKt.AppServiceCoroutineStub
+    private val service: AppServiceGrpcKt.AppServiceCoroutineStub,
+    private val applicationScope: ApplicationScope
 ) {
-    private var requestChannel: SendChannel<App.ChatRoomEventRequest>? = null
-    private var responseFlow: Flow<App.ChatRoomEventResponse>? = null
+    private val request = MutableSharedFlow<App.ChatRoomEventRequest>(Channel.BUFFERED)
+    private val _response = MutableSharedFlow<App.ChatRoomEventResponse>(Channel.BUFFERED)
     val response: Flow<App.ChatRoomEventResponse>
-        get() = responseFlow ?: throw IllegalStateException("require call join")
+        get() = _response
+    private var job: Job? = null
 
     fun join() {
-        val channel = Channel<App.ChatRoomEventRequest>(Channel.BUFFERED)
-        responseFlow = service.chatRoomEvent(channel.receiveAsFlow())
+        if (job != null) throw IllegalStateException("can not join while joined")
+        job = applicationScope.launch {
+            service.chatRoomEvent(request).collect {
+                _response.emit(it)
+            }
+        }
     }
 
     fun leave() {
-        requestChannel?.close()
-        requestChannel = null
-        responseFlow = null
+        val job = job ?: throw IllegalStateException("can not leave when not joined")
+        job.cancel()
+        this.job = null
     }
 
     suspend fun send(request: App.ChatRoomEventRequest) {
-        val requestChannel = this.requestChannel ?: throw IllegalStateException("require call join")
-        requestChannel.send(request)
+        if (job == null) throw IllegalStateException("require call join")
+        this.request.emit(request)
     }
 }
