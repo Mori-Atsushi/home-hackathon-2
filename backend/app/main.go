@@ -18,8 +18,19 @@ type server struct {
 	pb.UnimplementedAppServiceServer
 }
 
-func (*server) CreateUser(context.Context, *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+func (*server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+	name := req.GetName()
+	user := pb.User{
+		Id:   "id",
+		Name: name,
+	}
+	res := &pb.CreateUserResponse{
+		UserWithAuth: &pb.UserWithAuth{
+			User:        &user,
+			AccessToken: "ACCESS_TOKEN",
+		},
+	}
+	return res, nil
 }
 func (*server) ChatRoomEvent(pb.AppService_ChatRoomEventServer) error {
 	return status.Errorf(codes.Unimplemented, "method ChatRoomEvent not implemented")
