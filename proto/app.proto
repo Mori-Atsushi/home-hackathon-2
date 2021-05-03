@@ -12,7 +12,7 @@ message CreateUserRequest {
     string name = 1;
 }
 
-message CreateUserResponse　{
+message CreateUserResponse {
     UserWithAuth userWithAuth = 1;
 }
 message ChatRoomEventRequest {
