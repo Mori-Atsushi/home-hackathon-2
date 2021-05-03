@@ -25,7 +25,7 @@ update-go: clean-go
   proto/app.proto
 
 .PHONY: clean-android
-update-go: clean-android
+update-android: clean-android
 	cp -r ./proto ./app-android/app/src/main
 
 clean-go:
