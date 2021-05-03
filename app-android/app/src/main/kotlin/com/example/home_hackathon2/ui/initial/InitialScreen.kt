@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.home_hackathon2.ui.res.COLOR_BLACK
 
 @Composable
 fun InitialScreen() {
@@ -20,9 +21,17 @@ fun InitialScreen() {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
+            modifier = Modifier.padding(bottom = 12.dp),
+            color = COLOR_BLACK,
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             text = "ようこそ"
+        )
+        Text(
+            color = COLOR_BLACK,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            text = "音声入力で高速なコミュニーケーションを"
         )
     }
 }
