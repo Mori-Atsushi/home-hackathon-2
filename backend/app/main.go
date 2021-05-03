@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 
 	pb "local.packages/gen"
 
+	"com.home-hackathon-2/backend/database"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -19,7 +19,7 @@ import (
 )
 
 var db *sqlx.DB
-var mySQLConnectionData *MySQLConnectionEnv
+var mySQLConnectionData *database.MySQLConnectionEnv
 
 type server struct {
 	pb.UnimplementedAppServiceServer
@@ -29,37 +29,6 @@ type User struct {
 	ID          string `db:"uuid" json:"uuid"`
 	Name        string `db:"name" json:"name"`
 	AccessToken string `db:"access_token" json:"access_token"`
-}
-
-type MySQLConnectionEnv struct {
-	Host     string
-	Port     string
-	User     string
-	DBName   string
-	Password string
-}
-
-func NewMySQLConnectionEnv() *MySQLConnectionEnv {
-	return &MySQLConnectionEnv{
-		Host:     getEnv("MYSQL_HOST", "127.0.0.1"),
-		Port:     getEnv("MYSQL_PORT", "3306"),
-		User:     getEnv("MYSQL_USER", "ouchi"),
-		DBName:   getEnv("MYSQL_DBNAME", "ouchi"),
-		Password: getEnv("MYSQL_PASS", "ouchi"),
-	}
-}
-
-func getEnv(key, defaultValue string) string {
-	val := os.Getenv(key)
-	if val != "" {
-		return val
-	}
-	return defaultValue
-}
-
-func (mc *MySQLConnectionEnv) ConnectDB() (*sqlx.DB, error) {
-	dsn := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", mc.User, mc.Password, mc.Host, mc.Port, mc.DBName)
-	return sqlx.Open("mysql", dsn)
 }
 
 func (*server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
@@ -94,7 +63,8 @@ func (*server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.C
 }
 
 func (*server) ChatRoomEvent(pb.AppService_ChatRoomEventServer) error {
-	return status.Errorf(codes.Unimplemented, "method ChatRoomEvent not implemented")
+
+	return nil
 }
 
 func main() {
@@ -103,7 +73,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	mySQLConnectionData = NewMySQLConnectionEnv()
+	mySQLConnectionData = database.NewMySQLConnectionEnv()
 	db, err = mySQLConnectionData.ConnectDB()
 	if err != nil {
 		log.Fatalf("failed to load db: %v", err)
