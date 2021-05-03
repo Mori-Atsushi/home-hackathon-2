@@ -27,19 +27,8 @@ fun InitialScreen() {
             .fillMaxHeight(),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            modifier = Modifier.padding(bottom = 12.dp),
-            color = COLOR_BLACK,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            text = "ようこそ"
-        )
-        Text(
+        Message(
             modifier = Modifier.padding(bottom = 80.dp),
-            color = COLOR_BLACK,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            text = "音声入力で高速なコミュニーケーションを"
         )
         Divider(
             modifier = Modifier.padding(bottom = 24.dp),
@@ -51,6 +40,27 @@ fun InitialScreen() {
         TintButton(
             text = "はじめる",
             onClick = {}
+        )
+    }
+}
+
+@Composable
+private fun Message(
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(
+            modifier = Modifier.padding(bottom = 12.dp),
+            color = COLOR_BLACK,
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold,
+            text = "ようこそ"
+        )
+        Text(
+            color = COLOR_BLACK,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            text = "音声入力で高速なコミュニーケーションを"
         )
     }
 }
