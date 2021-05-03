@@ -10,8 +10,8 @@ help:
 	@echo "	make clean-go		...	delete .go files which related in proto generated"
 	@echo ""
 
-.PHONY: update-go update-swift
-init: update-go update-swift
+.PHONY: update-go
+init: update-go
 
 .PHONY: init
 update: init
