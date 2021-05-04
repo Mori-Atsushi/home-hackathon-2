@@ -1,7 +1,6 @@
 package com.example.home_hackathon2.di
 
-import com.example.home_hackathon2.repository.UserRepository
-import com.example.home_hackathon2.repository.UserRepositoryImpl
+import com.example.home_hackathon2.repository.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,6 +13,18 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindUserRepository(
-        userRepositoryImpl: UserRepositoryImpl
+        impl: UserRepositoryImpl
     ): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindChatRoomRepository(
+        impl: ChatRoomRepositoryImpl
+    ): ChatRoomRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindChatRepository(
+        impl: ChatRepositoryImpl
+    ): ChatRepository
 }
