@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.home_hackathon2.R
 import com.example.home_hackathon2.model.Chat
+import com.example.home_hackathon2.model.ChatRoomItem
 import com.example.home_hackathon2.ui.res.COLOR_BLACK
 import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.res.COLOR_PRIMARY
@@ -26,13 +27,14 @@ fun ChatRoomScreen() {
     val viewModel = rememberViewModel {
         it.getChatRoomViewModel()
     }
+    val chatRoom = viewModel.chatRoom.collectAsState()
     Box {
         Column(
             modifier = Modifier.fillMaxHeight(),
             verticalArrangement = Arrangement.Top
         ) {
             Header()
-            ChatList(chats = viewModel.chats.value)
+            ChatList(items = chatRoom.value.items)
         }
         MicButton(
             modifier = Modifier
@@ -66,17 +68,20 @@ private fun Header(
 }
 
 @Composable
-fun ChatList(chats: List<Chat>) {
+fun ChatList(items: List<ChatRoomItem>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        items(chats) {
-            if (it.user.name == "atushi") {
-                ChatRowMe(chat = it)
-            }
-            else {
-                ChatRow(chat = it)
+        items(items) {
+            when (it) {
+                is ChatRoomItem.Chat -> {
+                    if (it.value.user.name == "atushi") {
+                        ChatRowMe(chat = it.value)
+                    } else {
+                        ChatRow(chat = it.value)
+                    }
+                }
             }
         }
     }
@@ -178,6 +183,5 @@ private fun MicButton(
                 )
             }
         }
-
     }
 }
