@@ -15,6 +15,7 @@ import javax.inject.Singleton
 @Singleton
 class ChatRoomHelper @Inject constructor(
     private val grpc: Grpc,
+    private val authHelper: AuthHelper,
     private val applicationScope: ApplicationScope
 ) {
     private val request = MutableSharedFlow<App.ChatRoomEventRequest>(Channel.BUFFERED)
@@ -25,8 +26,9 @@ class ChatRoomHelper @Inject constructor(
 
     fun join() {
         if (job != null) throw IllegalStateException("can not join while joined")
+        val meta = authHelper.getMeta()
         job = applicationScope.launch {
-            grpc.chatRoomEvent(request).collect {
+            grpc.chatRoomEvent(request, meta).collect {
                 _response.emit(it)
             }
         }
