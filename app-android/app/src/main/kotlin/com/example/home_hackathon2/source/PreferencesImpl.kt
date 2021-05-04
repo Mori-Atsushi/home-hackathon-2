@@ -4,11 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
-import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class PreferencesImpl @Inject constructor(
-    @ActivityContext context: Context
+    @ApplicationContext context: Context
 ) : Preferences {
     companion object {
         private const val USER_ID = "user_id"

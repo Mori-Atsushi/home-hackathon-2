@@ -8,7 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
@@ -20,22 +23,33 @@ fun Modifier.paddingBottomIme(): Modifier = composed {
         mutableStateOf(0.dp)
     }
     DisposableEffect(view) {
-        val callback = object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
+        val animCallback = object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
             override fun onProgress(
                 insets: WindowInsetsCompat,
                 runningAnimations: MutableList<WindowInsetsAnimationCompat>
             ): WindowInsetsCompat {
-                val bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-                height.value = density.run {
-                    bottom.toDp()
-                }
+                height.value = insets.bottomImeInsetDp(density)
                 return insets
             }
         }
-        ViewCompat.setWindowInsetsAnimationCallback(view, callback)
+        val applyCallback = OnApplyWindowInsetsListener { _, insets ->
+            height.value = insets.bottomImeInsetDp(density)
+            insets
+        }
+        ViewCompat.setWindowInsetsAnimationCallback(view, animCallback)
+        ViewCompat.setOnApplyWindowInsetsListener(view, applyCallback)
         onDispose {
             ViewCompat.setWindowInsetsAnimationCallback(view, null)
+            ViewCompat.setOnApplyWindowInsetsListener(view, null)
         }
     }
     padding(bottom = height.value)
+}
+
+private fun WindowInsetsCompat.bottomImeInsetDp(density: Density): Dp {
+    val mask = WindowInsetsCompat.Type.ime() or WindowInsetsCompat.Type.systemBars()
+    val bottom = getInsets(mask).bottom
+    return density.run {
+        bottom.toDp()
+    }
 }
