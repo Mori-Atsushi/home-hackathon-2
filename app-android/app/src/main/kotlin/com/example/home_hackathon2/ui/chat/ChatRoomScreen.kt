@@ -1,26 +1,28 @@
 package com.example.home_hackathon2.ui.chat
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.home_hackathon2.R
-import com.example.home_hackathon2.model.Chat
-import com.example.home_hackathon2.model.ChatRoomItem
 import com.example.home_hackathon2.ui.res.COLOR_BLACK
 import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.res.COLOR_PRIMARY
 import com.example.home_hackathon2.ui.res.COLOR_WHITE
 import com.example.home_hackathon2.ui.tools.rememberViewModel
+import com.example.home_hackathon2.ui.widget.paddingInsets
 
 @Composable
 fun ChatRoomScreen() {
@@ -28,160 +30,109 @@ fun ChatRoomScreen() {
         it.getChatRoomViewModel()
     }
     val chatRoom = viewModel.chatRoom.collectAsState()
-    Box {
+    Box(
+        modifier = Modifier
+            .paddingInsets(top = true, bottom = true)
+            .fillMaxHeight()
+    ) {
         Column(
-            modifier = Modifier.fillMaxHeight(),
             verticalArrangement = Arrangement.Top
         ) {
             Header()
-            ChatList(items = chatRoom.value.items)
+            ChatList(
+                items = chatRoom.value.items,
+                modifier = Modifier.weight(1F),
+                contentPadding = PaddingValues(top = 12.dp, bottom = 30.dp)
+            )
+            Footer()
         }
-        MicButton(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(32.dp)
-        )
     }
-
-
 }
 
 @Composable
-private fun Header(
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = Modifier
-            .padding(top = 56.dp)
+private fun Header() {
+    Box(
+        modifier = Modifier.height(56.dp)
     ) {
         Text(
-            modifier = Modifier.padding(all = 24.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .align(Alignment.CenterStart),
             color = COLOR_BLACK,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
             text = "チャットルーム"
         )
-        TabRowDefaults.Divider(
-            color = COLOR_LIGHT
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .height(1.dp)
+                .background(COLOR_LIGHT)
         )
     }
 }
 
+@Preview
 @Composable
-fun ChatList(items: List<ChatRoomItem>) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
+private fun Footer() {
+    Box(
+        modifier = Modifier.height(56.dp)
     ) {
-        items(items) {
-            when (it) {
-                is ChatRoomItem.Chat -> {
-                    if (it.value.user.name == "atushi") {
-                        ChatRowMe(chat = it.value)
-                    } else {
-                        ChatRow(chat = it.value)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ChatText(
-    message: String,
-    color: Color = COLOR_BLACK
-) {
-    Text(
-        modifier = Modifier
-            .widthIn(max = 285.dp)
-            .padding(all = 8.dp),
-        text = message,
-        fontSize = 20.sp,
-        color = color
-    )
-}
-
-@Composable
-fun ChatRowMe(
-    chat: Chat,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.End
-    ) {
-        Column(
-            modifier = modifier.padding(
-                start = 16.dp,
-                top = 18.dp,
-                end = 16.dp,
-                bottom = 18.dp
-            ),
-            horizontalAlignment = Alignment.End
-        ) {
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                color = COLOR_PRIMARY
-            ) {
-                ChatText(
-                    message = chat.message,
-                    color = COLOR_WHITE
-                )
-            }
-            Text(text = "自分")
-        }
-    }
-
-}
-
-@Composable
-fun ChatRow(chat: Chat) {
-    Column(
-        modifier = Modifier.padding(
-            start = 16.dp,
-            top = 18.dp,
-            end = 16.dp,
-            bottom = 18.dp
+        Box(
+            modifier = Modifier
+                .offset(y = (-30).dp)
+                .requiredWidth(62.dp)
+                .requiredHeight(62.dp)
+                .clip(CircleShape)
+                .background(COLOR_LIGHT)
+                .align(Alignment.TopCenter)
         )
-    ) {
-        Surface(
-            shape = MaterialTheme.shapes.medium, // TODO: Fix chat shape
-            color = COLOR_LIGHT
-        ) {
-            ChatText(message = chat.message)
-        }
-        Text(text = chat.user.name)
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+                .height(1.dp)
+                .background(COLOR_LIGHT)
+        )
+        MicButton(
+            modifier = Modifier
+                .offset(y = (-30).dp)
+                .requiredWidth(60.dp)
+                .requiredHeight(60.dp)
+                .align(Alignment.TopCenter)
+        )
     }
 }
 
+@Preview
 @Composable
 private fun MicButton(
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.Center
+    Box(
+        modifier = modifier
+            .clip(CircleShape)
+            .width(60.dp)
+            .height(60.dp)
+            .background(COLOR_WHITE)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(),
+                onClick = {}
+            )
+            .border(2.dp, COLOR_PRIMARY, CircleShape)
     ) {
-
-        Surface(
-            modifier = Modifier.size(60.dp),
-            shape = CircleShape,
-            elevation = 4.dp
-        ) {
-            Button(
-                modifier = Modifier.fillMaxSize(),
-                onClick = { /* TODO */ },
-                colors = ButtonDefaults.textButtonColors(
-                    backgroundColor = COLOR_PRIMARY,
-                    contentColor = COLOR_WHITE
-                )
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_microphone_solid),
-                    contentDescription = null
-                )
-            }
-        }
+        Icon(
+            modifier = Modifier
+                .clip(CircleShape)
+                .width(52.dp)
+                .height(52.dp)
+                .background(color = COLOR_PRIMARY)
+                .padding(10.dp)
+                .align(Alignment.Center),
+            painter = painterResource(id = R.drawable.ic_microphone_solid),
+            contentDescription = null,
+            tint = COLOR_WHITE
+        )
     }
 }
