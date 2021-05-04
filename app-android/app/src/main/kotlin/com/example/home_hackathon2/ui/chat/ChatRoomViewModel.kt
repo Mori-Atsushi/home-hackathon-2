@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-class ChatViewModel @Inject constructor(
-    
+class ChatRoomViewModel @Inject constructor(
+
 ): ViewModel() {
     // TODO: get chats from usecase
     private val dummy = listOf(

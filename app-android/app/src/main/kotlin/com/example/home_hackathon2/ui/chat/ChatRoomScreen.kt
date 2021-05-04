@@ -22,9 +22,9 @@ import com.example.home_hackathon2.ui.res.COLOR_WHITE
 import com.example.home_hackathon2.ui.tools.rememberViewModel
 
 @Composable
-fun ChatScreen() {
+fun ChatRoomScreen() {
     val viewModel = rememberViewModel {
-        it.getChatViewModel()
+        it.getChatRoomViewModel()
     }
     Box {
         Column(
