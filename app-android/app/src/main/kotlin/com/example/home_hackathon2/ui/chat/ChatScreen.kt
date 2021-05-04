@@ -15,22 +15,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.home_hackathon2.R
 import com.example.home_hackathon2.model.Chat
-import com.example.home_hackathon2.model.User
 import com.example.home_hackathon2.ui.res.COLOR_BLACK
 import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.res.COLOR_PRIMARY
 import com.example.home_hackathon2.ui.res.COLOR_WHITE
+import com.example.home_hackathon2.ui.tools.rememberViewModel
 
 @Composable
 fun ChatScreen() {
-
+    val viewModel = rememberViewModel {
+        it.getChatViewModel()
+    }
     Box {
         Column(
             modifier = Modifier.fillMaxHeight(),
             verticalArrangement = Arrangement.Top
         ) {
             Header()
-            ChatList(chats = dummy)
+            ChatList(chats = viewModel.chats.value)
         }
         MicButton(
             modifier = Modifier
