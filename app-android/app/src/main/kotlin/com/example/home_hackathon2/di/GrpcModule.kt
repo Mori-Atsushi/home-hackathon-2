@@ -11,8 +11,8 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object GrpcModule {
-    private const val HOST = "127.0.0.1"
-    private const val PORT = 8080
+    private const val HOST = "35.243.113.15"
+    private const val PORT = 5300
 
     @Provides
     @Singleton
