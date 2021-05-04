@@ -1,9 +1,9 @@
 package com.example.home_hackathon2.ui.chat
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -67,14 +67,17 @@ private fun Header(
 
 @Composable
 fun ChatList(chats: List<Chat>) {
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .verticalScroll(rememberScrollState()),
     ) {
-        chats.forEach {
-            // TODO: Implement `isMe` or others
-            if (it.user.name == "atushi") ChatRowMe(chat = it, modifier = Modifier.align(Alignment.End)) else ChatRow(chat = it)
+        items(chats) {
+            if (it.user.name == "atushi") {
+                ChatRowMe(chat = it)
+            }
+            else {
+                ChatRow(chat = it)
+            }
         }
     }
 }
@@ -100,25 +103,31 @@ fun ChatRowMe(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(
-            start = 16.dp,
-            top = 18.dp,
-            end = 16.dp,
-            bottom = 18.dp
-        ),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End
     ) {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = COLOR_PRIMARY
+        Column(
+            modifier = modifier.padding(
+                start = 16.dp,
+                top = 18.dp,
+                end = 16.dp,
+                bottom = 18.dp
+            ),
+            horizontalAlignment = Alignment.End
         ) {
-            ChatText(
-                message = chat.message,
-                color = COLOR_WHITE
-            )
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = COLOR_PRIMARY
+            ) {
+                ChatText(
+                    message = chat.message,
+                    color = COLOR_WHITE
+                )
+            }
+            Text(text = "自分")
         }
-        Text(text = "自分")
     }
+
 }
 
 @Composable
