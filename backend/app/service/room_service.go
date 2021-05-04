@@ -1,8 +1,6 @@
 package service
 
 import (
-	"sync"
-
 	"com.home-hackathon-2/backend/domain"
 	"com.home-hackathon-2/backend/repository"
 )
@@ -17,8 +15,7 @@ type RoomService interface {
 
 type RoomServiceImpl struct {
 	userRepository repository.UserRepository
-	mutex          *sync.Mutex
-	channels       []chan<- domain.ChatRoomEvent
+	room           *domain.Room
 }
 
 func NewRoomServiceImpl(
@@ -26,8 +23,7 @@ func NewRoomServiceImpl(
 ) *RoomServiceImpl {
 	return &RoomServiceImpl{
 		userRepository: userRepository,
-		mutex:          &sync.Mutex{},
-		channels:       []chan<- domain.ChatRoomEvent{},
+		room:           domain.NewRoom(),
 	}
 }
 
@@ -40,15 +36,10 @@ func (s *RoomServiceImpl) Join(
 	if e != nil {
 		return e
 	}
-	s.addEventChannel(event)
+	session := s.room.Join(user, event)
 	s.observeQueryChannel(user, query)
+	s.room.Leave(session)
 	return e
-}
-
-func (s *RoomServiceImpl) addEventChannel(eventChannel chan<- domain.ChatRoomEvent) {
-	s.mutex.Lock()
-	s.channels = append(s.channels, eventChannel)
-	s.mutex.Unlock()
 }
 
 func (s *RoomServiceImpl) observeQueryChannel(user domain.User, queryChannel <-chan domain.ChatRoomQuery) {
@@ -57,21 +48,6 @@ func (s *RoomServiceImpl) observeQueryChannel(user domain.User, queryChannel <-c
 		if !ok {
 			break
 		}
-		s.handleQuery(user, query)
-	}
-}
-
-func (s *RoomServiceImpl) handleQuery(user domain.User, query domain.ChatRoomQuery) {
-	switch query.Type {
-	case domain.ChatSend:
-		chat := domain.NewChat(user, query.ChatSend.Message)
-		event := domain.NewChatRecieveEvent(chat)
-		s.sendEvent(event)
-	}
-}
-
-func (s *RoomServiceImpl) sendEvent(event domain.ChatRoomEvent) {
-	for _, channel := range s.channels {
-		channel <- event
+		s.room.HandleQuery(user, query)
 	}
 }
