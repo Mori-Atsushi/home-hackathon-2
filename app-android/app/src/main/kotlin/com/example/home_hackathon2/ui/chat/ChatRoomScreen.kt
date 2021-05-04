@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import android.content.Intent
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -17,15 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.home_hackathon2.R
+import com.example.home_hackathon2.model.ChatRoom
 import com.example.home_hackathon2.ui.listener.SimpleRecognizerListener
-import com.example.home_hackathon2.ui.res.COLOR_BLACK
-import com.example.home_hackathon2.ui.res.COLOR_LIGHT
-import com.example.home_hackathon2.ui.res.COLOR_PRIMARY
-import com.example.home_hackathon2.ui.res.COLOR_WHITE
+import com.example.home_hackathon2.ui.res.*
 import com.example.home_hackathon2.ui.tools.rememberViewModel
 import com.example.home_hackathon2.ui.widget.paddingInsets
 
@@ -47,10 +47,9 @@ fun ChatRoomScreen() {
             verticalArrangement = Arrangement.Top
         ) {
             Header()
-            ChatList(
-                items = chatRoom.value.items,
-                modifier = Modifier.weight(1F),
-                contentPadding = PaddingValues(top = 12.dp, bottom = 30.dp)
+            MainContent(
+                chatRoom = chatRoom.value,
+                modifier = Modifier.weight(1F)
             )
             Footer()
         }
@@ -60,6 +59,26 @@ fun ChatRoomScreen() {
             micInViewModel.send(it)
         }
     )
+}
+
+@Composable
+private fun MainContent(
+    chatRoom: ChatRoom,
+    modifier: Modifier = Modifier
+) {
+    Crossfade(
+        modifier = modifier,
+        targetState = chatRoom.items.isEmpty()
+    ) {
+        if (it) {
+            Empty()
+        } else {
+            ChatList(
+                items = chatRoom.items,
+                contentPadding = PaddingValues(top = 12.dp, bottom = 30.dp)
+            )
+        }
+    }
 }
 
 @Composable
@@ -150,6 +169,30 @@ private fun MicButton(
     }
 }
 
+@Preview
+@Composable
+private fun Empty() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            modifier = Modifier
+                .width(100.dp)
+                .padding(bottom = 20.dp),
+            painter = painterResource(id = R.drawable.icon),
+            contentDescription = null,
+            tint = COLOR_PRIMARY
+        )
+        Text(
+            text = "まだ誰も話してないようです\n喋るだけでメッセージが送信されます",
+            color = COLOR_DARK,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
 
 @Composable
 fun SpeechRecognizer(
@@ -162,10 +205,13 @@ fun SpeechRecognizer(
     val intent = remember {
         Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
     }
-    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+    intent.putExtra(
+        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+    )
     intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, LocalContext.current.packageName)
 
-    val callback = remember{
+    val callback = remember {
         object : SimpleRecognizerListener.SimpleRecognizerResponseListener {
             override fun onRecognizedResult(speechText: String) {
                 if (speechText.isNotBlank()) {
