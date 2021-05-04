@@ -9,17 +9,16 @@ import (
 	pb "local.packages/gen"
 
 	"com.home-hackathon-2/backend/database"
+	"com.home-hackathon-2/backend/registory"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
-	"google.golang.org/grpc/status"
 )
 
 var db *sqlx.DB
 var mySQLConnectionData *database.MySQLConnectionEnv
+var r *registory.Registory
 
 type server struct {
 	pb.UnimplementedAppServiceServer
@@ -32,31 +31,17 @@ type User struct {
 }
 
 func (*server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+	userService := r.GetUserService()
 	name := req.GetName()
-	uuidForKey := uuid.Must(uuid.NewRandom()).String()
-	accessToken := uuid.Must(uuid.NewRandom()).String()
-
-	tx, err := db.Begin()
-	if err != nil {
-		return nil, status.Errorf(codes.Unavailable, "DB not launched")
-	}
-	defer tx.Rollback()
-
-	_, err = tx.Exec("INSERT INTO user(uuid, name, access_token) VALUES(?,?,?)", uuidForKey, name, accessToken)
-	if err != nil {
-		return nil, status.Errorf(codes.Unavailable, "Cannot insert data")
-	}
-	if err := tx.Commit(); err != nil {
-		return nil, status.Errorf(codes.Unavailable, "Cannot insert data")
-	}
+	userWithAuth := userService.Create(name)
 
 	res := &pb.CreateUserResponse{
 		UserWithAuth: &pb.UserWithAuth{
 			User: &pb.User{
-				Id:   uuidForKey,
-				Name: name,
+				Id:   userWithAuth.User.ID,
+				Name: userWithAuth.User.Name,
 			},
-			AccessToken: accessToken,
+			AccessToken: userWithAuth.AccessToken,
 		},
 	}
 	return res, nil
@@ -86,4 +71,5 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+	r = registory.NewRegistory()
 }
