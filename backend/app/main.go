@@ -16,6 +16,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
+
+	_ "com.home-hackathon-2/backend/model"
 )
 
 var db *sqlx.DB
@@ -62,8 +64,7 @@ func (*server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.C
 	return res, nil
 }
 
-func (*server) ChatRoomEvent(pb.AppService_ChatRoomEventServer) error {
-
+func (s *server) ChatRoomEvent(pb.AppService_ChatRoomEventServer) error {
 	return nil
 }
 
