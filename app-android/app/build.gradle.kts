@@ -3,7 +3,9 @@ import com.google.protobuf.gradle.*
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    id("kotlin-kapt")
     id("com.google.protobuf")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -63,6 +65,9 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.0.0-beta05")
     implementation("androidx.compose.material:material:1.0.0-beta05")
     implementation("androidx.activity:activity-compose:1.3.0-alpha07")
+
+    implementation("com.google.dagger:hilt-android:2.34-beta")
+    kapt("com.google.dagger:hilt-android-compiler:2.34-beta")
 
     runtimeOnly("io.grpc:grpc-okhttp:1.37.0")
     implementation("io.grpc:grpc-protobuf-lite:1.37.0")
