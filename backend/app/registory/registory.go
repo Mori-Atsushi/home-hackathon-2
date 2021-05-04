@@ -4,6 +4,7 @@ import (
 	"com.home-hackathon-2/backend/database"
 	"com.home-hackathon-2/backend/repository"
 	"com.home-hackathon-2/backend/service"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -30,12 +31,10 @@ func (r *Registory) GetUserService() service.UserService {
 
 func setupDB() (*sqlx.DB, error) {
 	mySQLConnectionData := database.NewMySQLConnectionEnv()
-	mySQLConnectionData = database.NewMySQLConnectionEnv()
 	db, err := mySQLConnectionData.ConnectDB()
 	if err != nil {
 		return nil, err
 	}
 	db.SetMaxOpenConns(10)
-	defer db.Close()
 	return db, nil
 }
