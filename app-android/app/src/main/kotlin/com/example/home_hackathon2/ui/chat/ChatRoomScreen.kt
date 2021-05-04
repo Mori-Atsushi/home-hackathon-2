@@ -1,5 +1,6 @@
 package com.example.home_hackathon2.ui.chat
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.home_hackathon2.R
@@ -21,6 +21,7 @@ import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.res.COLOR_PRIMARY
 import com.example.home_hackathon2.ui.res.COLOR_WHITE
 import com.example.home_hackathon2.ui.tools.rememberViewModel
+import com.example.home_hackathon2.ui.widget.paddingTopStatusBar
 
 @Composable
 fun ChatRoomScreen() {
@@ -28,9 +29,12 @@ fun ChatRoomScreen() {
         it.getChatRoomViewModel()
     }
     val chatRoom = viewModel.chatRoom.collectAsState()
-    Box {
+    Box(
+        modifier = Modifier
+            .paddingTopStatusBar()
+            .fillMaxHeight()
+    ) {
         Column(
-            modifier = Modifier.fillMaxHeight(),
             verticalArrangement = Arrangement.Top
         ) {
             Header()
@@ -47,22 +51,24 @@ fun ChatRoomScreen() {
 }
 
 @Composable
-private fun Header(
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = Modifier
-            .padding(top = 56.dp)
+private fun Header() {
+    Box(
+        modifier = Modifier.height(56.dp)
     ) {
         Text(
-            modifier = Modifier.padding(all = 24.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .align(Alignment.CenterStart),
             color = COLOR_BLACK,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
             text = "チャットルーム"
         )
-        TabRowDefaults.Divider(
-            color = COLOR_LIGHT
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .height(1.dp)
+                .background(COLOR_LIGHT)
         )
     }
 }

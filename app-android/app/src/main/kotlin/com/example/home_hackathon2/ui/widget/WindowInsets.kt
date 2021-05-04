@@ -16,6 +16,29 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 
+fun Modifier.paddingTopStatusBar(): Modifier = composed {
+    val view = LocalView.current
+    val density = LocalDensity.current
+    val height = remember {
+        mutableStateOf(0.dp)
+    }
+    DisposableEffect(view) {
+        val applyCallback = OnApplyWindowInsetsListener { _, insets ->
+            val mask = WindowInsetsCompat.Type.statusBars()
+            val bottom = insets.getInsets(mask).top
+            height.value = density.run {
+                bottom.toDp()
+            }
+            insets
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(view, applyCallback)
+        onDispose {
+            ViewCompat.setOnApplyWindowInsetsListener(view, null)
+        }
+    }
+    padding(top = height.value)
+}
+
 fun Modifier.paddingBottomIme(): Modifier = composed {
     val view = LocalView.current
     val density = LocalDensity.current
