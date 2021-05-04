@@ -18,13 +18,15 @@ import com.example.home_hackathon2.ui.res.COLOR_DARK
 import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.widget.BorderTextField
 import com.example.home_hackathon2.ui.widget.TintButton
+import com.example.home_hackathon2.ui.widget.paddingBottomIme
 
 @Composable
 fun InitialScreen() {
     Column(
         modifier = Modifier
+            .fillMaxHeight()
             .padding(horizontal = 30.dp)
-            .fillMaxHeight(),
+            .paddingBottomIme(),
         verticalArrangement = Arrangement.Center
     ) {
         Message(
