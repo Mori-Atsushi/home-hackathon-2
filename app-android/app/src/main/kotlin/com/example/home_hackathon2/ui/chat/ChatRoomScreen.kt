@@ -41,9 +41,8 @@ fun ChatRoomScreen() {
             Header()
             ChatList(
                 items = chatRoom.value.items,
-                modifier = Modifier
-                    .padding(vertical = 12.dp)
-                    .weight(1F)
+                modifier = Modifier.weight(1F),
+                contentPadding = PaddingValues(top = 12.dp, bottom = 30.dp)
             )
             Footer()
         }

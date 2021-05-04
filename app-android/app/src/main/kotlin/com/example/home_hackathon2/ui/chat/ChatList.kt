@@ -2,6 +2,7 @@ package com.example.home_hackathon2.ui.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,11 +24,12 @@ import com.example.home_hackathon2.ui.res.*
 @Composable
 fun ChatList(
     items: List<ChatRoomItem>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = contentPadding,
     ) {
         items(items) {
             when (it) {
