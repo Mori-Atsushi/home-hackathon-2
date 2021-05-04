@@ -8,9 +8,7 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-COPY ./app/go.mod .
-COPY ./app/gen/go.mod ./gen/go.mod
-COPY ./app/go.sum .
+COPY ./app/ .
 RUN go mod download
 COPY ./app/main.go .
 COPY ./app/gen/ ./gen/
