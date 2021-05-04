@@ -1,9 +1,9 @@
 package com.example.home_hackathon2.ui
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import com.example.home_hackathon2.ui.chat.ChatRoomScreen
 import com.example.home_hackathon2.ui.initial.InitialScreen
 import com.example.home_hackathon2.ui.tools.rememberViewModel
 
@@ -17,8 +17,7 @@ fun App() {
         if (it) {
             InitialScreen()
         } else {
-            // TODO: change
-            Text("Hello World")
+            ChatRoomScreen()
         }
     }
 }
