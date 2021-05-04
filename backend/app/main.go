@@ -13,7 +13,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 )
 
 var db *sqlx.DB
@@ -27,7 +29,10 @@ type server struct {
 func (*server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	userService := r.GetUserService()
 	name := req.GetName()
-	userWithAuth := userService.Create(name)
+	userWithAuth, err := userService.Create(name)
+	if err != nil {
+		return nil, status.Errorf(codes.Unavailable, err.Error())
+	}
 
 	res := &pb.CreateUserResponse{
 		UserWithAuth: &pb.UserWithAuth{

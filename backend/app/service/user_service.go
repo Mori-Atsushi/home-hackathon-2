@@ -6,7 +6,7 @@ import (
 )
 
 type UserService interface {
-	Create(name string) domain.UserWithAuth
+	Create(name string) (domain.UserWithAuth, error)
 }
 
 type UserServiceImpl struct {
@@ -21,8 +21,11 @@ func NewUserServiceImpl(
 	}
 }
 
-func (u *UserServiceImpl) Create(name string) domain.UserWithAuth {
+func (u *UserServiceImpl) Create(name string) (domain.UserWithAuth, error) {
 	user := domain.NewUserWithAuth(name)
-	u.repository.Save(user)
-	return user
+	err := u.repository.Save(user)
+	if err != nil {
+		return domain.UserWithAuth{}, err
+	}
+	return user, nil
 }
