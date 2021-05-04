@@ -155,8 +155,13 @@ private fun MicButton(
 fun SpeechRecognizer(
     onRecognized: (String) -> Unit
 ) {
-    val speechRecognizer = SpeechRecognizer.createSpeechRecognizer(LocalContext.current)
-    val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+    val context = LocalContext.current
+    val speechRecognizer = remember {
+        SpeechRecognizer.createSpeechRecognizer(context)
+    }
+    val intent = remember {
+        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+    }
     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
     intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, LocalContext.current.packageName)
 
