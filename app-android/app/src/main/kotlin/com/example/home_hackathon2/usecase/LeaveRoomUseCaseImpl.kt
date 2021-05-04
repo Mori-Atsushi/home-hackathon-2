@@ -7,7 +7,7 @@ import javax.inject.Inject
 class LeaveRoomUseCaseImpl @Inject constructor(
     private val repository: ChatRoomRepository
 ) : LeaveRoomUseCase {
-    override suspend fun invoke(input: Unit): SimpleResult<Unit> {
+    override fun invoke(input: Unit): SimpleResult<Unit> {
         return SimpleResult.of {
             repository.leave()
         }
