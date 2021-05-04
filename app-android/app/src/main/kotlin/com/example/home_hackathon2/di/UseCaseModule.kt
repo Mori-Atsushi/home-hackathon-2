@@ -29,4 +29,9 @@ abstract class UseCaseModule {
     abstract fun bindLeaveRoomUseCase(
         impl: LeaveRoomUseCaseImpl
     ): LeaveRoomUseCase
+
+    @Binds
+    abstract fun bindObserveChatRoomUseCase(
+        impl: ObserveChatRoomUseCaseImpl
+    ): ObserveChatRoomUseCase
 }
