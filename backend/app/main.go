@@ -24,12 +24,6 @@ type server struct {
 	pb.UnimplementedAppServiceServer
 }
 
-type User struct {
-	ID          string `db:"uuid" json:"uuid"`
-	Name        string `db:"name" json:"name"`
-	AccessToken string `db:"access_token" json:"access_token"`
-}
-
 func (*server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	userService := r.GetUserService()
 	name := req.GetName()
@@ -58,18 +52,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	mySQLConnectionData = database.NewMySQLConnectionEnv()
-	db, err = mySQLConnectionData.ConnectDB()
+	registory, err := registory.NewRegistory()
 	if err != nil {
-		log.Fatalf("failed to load db: %v", err)
+		log.Fatalf("failed to serve: %v", err)
 	}
-	db.SetMaxOpenConns(10)
-	defer db.Close()
+	r = registory
 	s := grpc.NewServer()
 	pb.RegisterAppServiceServer(s, &server{})
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
-	r = registory.NewRegistory()
 }
