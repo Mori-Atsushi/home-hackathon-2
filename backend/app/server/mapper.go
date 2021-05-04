@@ -30,5 +30,5 @@ func toDomainAuth(ctx context.Context) (domain.Auth, error) {
 	if len(accessTokenList) == 0 || len(userIdList) == 0 {
 		return domain.Auth{}, errors.New("require auth")
 	}
-	return domain.NewAuth(accessTokenList[0], userIdList[0]), nil
+	return domain.NewAuth(userIdList[0], accessTokenList[0]), nil
 }

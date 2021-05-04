@@ -47,8 +47,8 @@ func (r *UserRepositoryImpl) Get(auth domain.Auth) (domain.User, error) {
 
 	var uuid string
 	var name string
-	row := tx.QueryRow("SELECT uuid, name FROM user WHERE uuid = ? AND name = ?", auth.UserID, auth.AccessToken)
-	err = row.Scan(&uuid, name)
+	row := tx.QueryRow("SELECT uuid, name FROM user WHERE uuid = ? AND access_token = ?", auth.UserID, auth.AccessToken)
+	err = row.Scan(&uuid, &name)
 	if err != nil {
 		return domain.User{}, err
 	}
