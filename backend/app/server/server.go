@@ -34,6 +34,12 @@ func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb
 	return res, nil
 }
 
-func (s *Server) ChatRoomEvent(pb.AppService_ChatRoomEventServer) error {
+func (s *Server) ChatRoomEvent(req pb.AppService_ChatRoomEventServer) error {
+	roomService := s.reg.GetRoomService()
+	auth, err := toDomainAuth(req.Context())
+	if err != nil {
+		return err
+	}
+	roomService.Join(auth)
 	return nil
 }
