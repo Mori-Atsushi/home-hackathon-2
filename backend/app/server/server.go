@@ -41,11 +41,48 @@ func (s *Server) ChatRoomEvent(req pb.AppService_ChatRoomEventServer) error {
 	if err != nil {
 		return err
 	}
-	query := make(chan domain.ChatRoomQuery)
-	event := make(chan domain.ChatRoomEvent)
+	query := makeQuery(req)
+	event := makeEvent(req)
 	err = roomService.Join(auth, query, event)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func makeQuery(req pb.AppService_ChatRoomEventServer) <-chan domain.ChatRoomQuery {
+	channel := make(chan domain.ChatRoomQuery)
+	go func() {
+		for {
+			req, err := req.Recv()
+			if err != nil {
+				break
+			}
+			query, err := toDomainQuery(req)
+			if err == nil {
+				channel <- query
+			}
+		}
+		close(channel)
+	}()
+	return channel
+}
+
+func makeEvent(req pb.AppService_ChatRoomEventServer) chan<- domain.ChatRoomEvent {
+	channel := make(chan domain.ChatRoomEvent)
+	go func() {
+		for {
+			event, ok := <-channel
+			if !ok {
+				break
+			}
+			pb := toPBEvent(event)
+			err := req.Send(pb)
+			if err == nil {
+				break
+			}
+		}
+		close(channel)
+	}()
+	return channel
 }
