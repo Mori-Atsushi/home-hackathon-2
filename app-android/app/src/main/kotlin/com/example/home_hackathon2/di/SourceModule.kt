@@ -1,5 +1,7 @@
 package com.example.home_hackathon2.di
 
+import com.example.home_hackathon2.source.Grpc
+import com.example.home_hackathon2.source.GrpcImpl
 import com.example.home_hackathon2.source.Preferences
 import com.example.home_hackathon2.source.PreferencesImpl
 import dagger.Binds
@@ -16,4 +18,10 @@ abstract class SourceModule {
     abstract fun bindsPreferences(
         impl: PreferencesImpl
     ): Preferences
+
+    @Binds
+    @Singleton
+    abstract fun bindGrpc(
+        impl: GrpcImpl
+    ): Grpc
 }
