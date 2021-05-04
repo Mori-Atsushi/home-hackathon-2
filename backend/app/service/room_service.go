@@ -36,9 +36,9 @@ func (s *RoomServiceImpl) Join(
 	if e != nil {
 		return e
 	}
-	session := s.room.Join(user, event)
+	sessionId := s.room.Join(user, event)
 	s.observeQueryChannel(user, query)
-	s.room.Leave(session)
+	s.room.Leave(sessionId)
 	return e
 }
 

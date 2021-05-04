@@ -3,11 +3,17 @@ package domain
 import "github.com/google/uuid"
 
 type Session struct {
-	ID string
+	ID      string
+	channel chan<- ChatRoomEvent
 }
 
-func NewSession() Session {
-	return Session{
-		ID: uuid.Must(uuid.NewRandom()).String(),
+func NewSession(channel chan<- ChatRoomEvent) *Session {
+	return &Session{
+		ID:      uuid.Must(uuid.NewRandom()).String(),
+		channel: channel,
 	}
+}
+
+func (s *Session) Send(event ChatRoomEvent) {
+	s.channel <- event
 }

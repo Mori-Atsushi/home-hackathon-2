@@ -4,25 +4,25 @@ import "sync"
 
 type Room struct {
 	mutex    *sync.Mutex
-	channels map[Session]chan<- ChatRoomEvent
+	sessions map[string]*Session
 }
 
 func NewRoom() *Room {
 	return &Room{
 		mutex:    &sync.Mutex{},
-		channels: map[Session]chan<- ChatRoomEvent{},
+		sessions: map[string]*Session{},
 	}
 }
 
 func (r *Room) Join(
 	user User,
 	event chan<- ChatRoomEvent,
-) Session {
-	session := NewSession()
+) string {
+	session := NewSession(event)
 	r.mutex.Lock()
-	r.channels[session] = event
+	r.sessions[session.ID] = session
 	r.mutex.Unlock()
-	return session
+	return session.ID
 }
 
 func (r *Room) HandleQuery(user User, query ChatRoomQuery) {
@@ -34,14 +34,14 @@ func (r *Room) HandleQuery(user User, query ChatRoomQuery) {
 	}
 }
 
-func (r *Room) Leave(session Session) {
+func (r *Room) Leave(sessionID string) {
 	r.mutex.Lock()
-	delete(r.channels, session)
+	delete(r.sessions, sessionID)
 	r.mutex.Unlock()
 }
 
 func (r *Room) sendEvent(event ChatRoomEvent) {
-	for _, channel := range r.channels {
-		channel <- event
+	for _, channel := range r.sessions {
+		channel.Send(event)
 	}
 }
