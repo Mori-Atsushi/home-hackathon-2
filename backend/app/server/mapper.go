@@ -23,6 +23,39 @@ func toPBUserWithAuth(userWithAuth domain.UserWithAuth) *pb.UserWithAuth {
 	}
 }
 
+func toPBChat(chat domain.Chat) *pb.Chat {
+	return &pb.Chat{
+		User:    toPBUser(chat.User),
+		Message: chat.Message,
+	}
+}
+
+func toPBEvent(event domain.ChatRoomEvent) *pb.ChatRoomEventResponse {
+	var response pb.ChatRoomEventResponse_ChatRecieveResponse
+	switch event.Type {
+	case domain.ChatRecieve:
+		response = pb.ChatRoomEventResponse_ChatRecieveResponse{
+			ChatRecieveResponse: &pb.ChatReceiveResponse{
+				Chat: toPBChat(event.ChatRecieve.Chat),
+			},
+		}
+	}
+	return &pb.ChatRoomEventResponse{
+		EventOneof: &response,
+	}
+}
+
+func toDomainQuery(req *pb.ChatRoomEventRequest) (domain.ChatRoomQuery, error) {
+	var query domain.ChatRoomQuery
+	switch req.EventOneof.(type) {
+	case *pb.ChatRoomEventRequest_SendChatRequest:
+		query = domain.NewChatSendQuery(req.GetSendChatRequest().GetMessage())
+	default:
+		return domain.ChatRoomQuery{}, errors.New("unkown query")
+	}
+	return query, nil
+}
+
 func toDomainAuth(ctx context.Context) (domain.Auth, error) {
 	md, _ := metadata.FromIncomingContext(ctx)
 	accessTokenList := md.Get("accessToken")

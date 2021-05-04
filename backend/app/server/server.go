@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 
+	"com.home-hackathon-2/backend/domain"
 	"com.home-hackathon-2/backend/registory"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -40,9 +41,48 @@ func (s *Server) ChatRoomEvent(req pb.AppService_ChatRoomEventServer) error {
 	if err != nil {
 		return err
 	}
-	err = roomService.Join(auth)
+	query := makeQuery(req)
+	event := makeEvent(req)
+	err = roomService.Join(auth, query, event)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func makeQuery(req pb.AppService_ChatRoomEventServer) <-chan domain.ChatRoomQuery {
+	channel := make(chan domain.ChatRoomQuery, 5)
+	go func() {
+		for {
+			req, err := req.Recv()
+			if err != nil {
+				break
+			}
+			query, err := toDomainQuery(req)
+			if err == nil {
+				channel <- query
+			}
+		}
+		close(channel)
+	}()
+	return channel
+}
+
+func makeEvent(req pb.AppService_ChatRoomEventServer) chan<- domain.ChatRoomEvent {
+	channel := make(chan domain.ChatRoomEvent, 5)
+	go func() {
+		for {
+			event, ok := <-channel
+			if !ok {
+				break
+			}
+			pb := toPBEvent(event)
+			err := req.Send(pb)
+			if err != nil {
+				break
+			}
+		}
+		close(channel)
+	}()
+	return channel
 }
