@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -13,37 +14,45 @@ import com.example.home_hackathon2.ui.res.COLOR_BLACK
 import com.example.home_hackathon2.ui.res.COLOR_DARK
 import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.tools.rememberViewModel
-import com.example.home_hackathon2.ui.widget.BorderTextField
-import com.example.home_hackathon2.ui.widget.TintButton
-import com.example.home_hackathon2.ui.widget.paddingBottomIme
+import com.example.home_hackathon2.ui.widget.*
+import kotlinx.coroutines.flow.receiveAsFlow
 
 @Composable
 fun InitialScreen() {
     val viewModel = rememberViewModel {
         it.getInitialViewModel()
     }
-    Column(
+    Box(
         modifier = Modifier
-            .fillMaxHeight()
-            .padding(horizontal = 30.dp)
+            .fillMaxSize()
             .paddingBottomIme(),
-        verticalArrangement = Arrangement.Center
     ) {
-        Message(
-            modifier = Modifier.padding(bottom = 80.dp),
-        )
-        Divider(
-            modifier = Modifier.padding(bottom = 24.dp),
-            color = COLOR_LIGHT
-        )
-        NameTextField(
-            text = viewModel.name.collectAsState().value,
-            onValueChange = viewModel::handleChangeName,
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
-        TintButton(
-            text = "はじめる",
-            onClick = viewModel::submit
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = 30.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Message(
+                modifier = Modifier.padding(bottom = 80.dp),
+            )
+            Divider(
+                modifier = Modifier.padding(bottom = 24.dp),
+                color = COLOR_LIGHT
+            )
+            NameTextField(
+                text = viewModel.name.collectAsState().value,
+                onValueChange = viewModel::handleChangeName,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
+            TintButton(
+                text = "はじめる",
+                onClick = viewModel::submit
+            )
+        }
+        ErrorSnackbarHost(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            messages = viewModel.errorMessage.receiveAsFlow()
         )
     }
 }
