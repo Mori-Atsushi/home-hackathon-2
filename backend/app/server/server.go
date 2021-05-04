@@ -40,6 +40,9 @@ func (s *Server) ChatRoomEvent(req pb.AppService_ChatRoomEventServer) error {
 	if err != nil {
 		return err
 	}
-	roomService.Join(auth)
+	err = roomService.Join(auth)
+	if err != nil {
+		return err
+	}
 	return nil
 }
