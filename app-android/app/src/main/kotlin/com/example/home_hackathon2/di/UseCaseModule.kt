@@ -34,4 +34,9 @@ abstract class UseCaseModule {
     abstract fun bindObserveChatRoomUseCase(
         impl: ObserveChatRoomUseCaseImpl
     ): ObserveChatRoomUseCase
+
+    @Binds
+    abstract fun bindSendChatUseCase(
+        impl: SendChatUseCaseImpl
+    ): SendChatUseCase
 }
