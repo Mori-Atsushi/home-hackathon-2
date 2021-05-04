@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,6 +23,7 @@ import com.example.home_hackathon2.ui.res.COLOR_WHITE
 
 @Composable
 fun ChatScreen() {
+    // TODO: get chats from viewmodel
     val dummy = listOf(
         Chat(
             user = User(
@@ -106,9 +108,25 @@ fun ChatList(chats: List<Chat>) {
             .verticalScroll(rememberScrollState()),
     ) {
         chats.forEach {
+            // TODO: Implement `isMe` or others
             if (it.user.name == "atushi") ChatRowMe(chat = it, modifier = Modifier.align(Alignment.End)) else ChatRow(chat = it)
         }
     }
+}
+
+@Composable
+fun ChatText(
+    message: String,
+    color: Color = COLOR_BLACK
+) {
+    Text(
+        modifier = Modifier
+            .widthIn(max = 285.dp)
+            .padding(all = 8.dp),
+        text = message,
+        fontSize = 20.sp,
+        color = color
+    )
 }
 
 @Composable
@@ -129,12 +147,8 @@ fun ChatRowMe(
             shape = MaterialTheme.shapes.medium,
             color = COLOR_PRIMARY
         ) {
-            Text(
-                modifier = Modifier
-                    .widthIn(max = 285.dp)
-                    .padding(all = 8.dp),
-                text = chat.message,
-                fontSize = 20.sp,
+            ChatText(
+                message = chat.message,
                 color = COLOR_WHITE
             )
         }
@@ -153,16 +167,10 @@ fun ChatRow(chat: Chat) {
         )
     ) {
         Surface(
-            shape = MaterialTheme.shapes.medium,
+            shape = MaterialTheme.shapes.medium, // TODO: Fix chat shape
             color = COLOR_LIGHT
         ) {
-            Text(
-                modifier = Modifier
-                    .widthIn(max = 285.dp)
-                    .padding(all = 8.dp),
-                text = chat.message,
-                fontSize = 20.sp,
-            )
+            ChatText(message = chat.message)
         }
         Text(text = chat.user.name)
     }
@@ -184,7 +192,7 @@ private fun MicButton(
         ) {
             Button(
                 modifier = Modifier.fillMaxSize(),
-                onClick = { /* Do something! */ },
+                onClick = { /* TODO */ },
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = COLOR_PRIMARY,
                     contentColor = COLOR_WHITE
@@ -192,7 +200,7 @@ private fun MicButton(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_microphone_solid),
-                    contentDescription = null // decorative element
+                    contentDescription = null
                 )
             }
         }
