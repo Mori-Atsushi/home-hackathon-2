@@ -26,7 +26,7 @@ func (r *UserRepositoryImpl) Save(user domain.UserWithAuth) error {
 	}
 	defer tx.Rollback()
 
-	_, err = tx.Exec("INSERT INTO user(uuid, name, access_token) VALUES(?,?,?)", uuidForKey, name, accessToken)
+	_, err = tx.Exec("INSERT INTO user(uuid, name, access_token) VALUES(?,?,?)", user.User.ID, user.User.Name, user.AccessToken)
 	if err != nil {
 		return err
 	}
