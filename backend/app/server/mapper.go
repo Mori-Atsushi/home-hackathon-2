@@ -31,12 +31,17 @@ func toPBChat(chat domain.Chat) *pb.Chat {
 }
 
 func toPBEvent(event domain.ChatRoomEvent) *pb.ChatRoomEventResponse {
-	return &pb.ChatRoomEventResponse{
-		EventOneof: &pb.ChatRoomEventResponse_ChatRecieveResponse{
+	var response pb.ChatRoomEventResponse_ChatRecieveResponse
+	switch event.Type {
+	case domain.ChatRecieve:
+		response = pb.ChatRoomEventResponse_ChatRecieveResponse{
 			ChatRecieveResponse: &pb.ChatReceiveResponse{
 				Chat: toPBChat(event.ChatRecieve.Chat),
 			},
-		},
+		}
+	}
+	return &pb.ChatRoomEventResponse{
+		EventOneof: &response,
 	}
 }
 
@@ -44,7 +49,7 @@ func toDomainQuery(req *pb.ChatRoomEventRequest) (domain.ChatRoomQuery, error) {
 	var query domain.ChatRoomQuery
 	switch req.EventOneof.(type) {
 	case *pb.ChatRoomEventRequest_SendChatRequest:
-		query = domain.ChatRoomQuery{}
+		query = domain.NewChatSendQuery(req.GetSendChatRequest().GetMessage())
 	default:
 		return domain.ChatRoomQuery{}, errors.New("unkown query")
 	}

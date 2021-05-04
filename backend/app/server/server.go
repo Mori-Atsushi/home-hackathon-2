@@ -51,7 +51,7 @@ func (s *Server) ChatRoomEvent(req pb.AppService_ChatRoomEventServer) error {
 }
 
 func makeQuery(req pb.AppService_ChatRoomEventServer) <-chan domain.ChatRoomQuery {
-	channel := make(chan domain.ChatRoomQuery)
+	channel := make(chan domain.ChatRoomQuery, 5)
 	go func() {
 		for {
 			req, err := req.Recv()
@@ -69,7 +69,7 @@ func makeQuery(req pb.AppService_ChatRoomEventServer) <-chan domain.ChatRoomQuer
 }
 
 func makeEvent(req pb.AppService_ChatRoomEventServer) chan<- domain.ChatRoomEvent {
-	channel := make(chan domain.ChatRoomEvent)
+	channel := make(chan domain.ChatRoomEvent, 5)
 	go func() {
 		for {
 			event, ok := <-channel
@@ -78,7 +78,7 @@ func makeEvent(req pb.AppService_ChatRoomEventServer) chan<- domain.ChatRoomEven
 			}
 			pb := toPBEvent(event)
 			err := req.Send(pb)
-			if err == nil {
+			if err != nil {
 				break
 			}
 		}
