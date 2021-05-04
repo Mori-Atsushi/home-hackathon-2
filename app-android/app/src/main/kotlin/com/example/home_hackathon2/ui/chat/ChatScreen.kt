@@ -23,44 +23,7 @@ import com.example.home_hackathon2.ui.res.COLOR_WHITE
 
 @Composable
 fun ChatScreen() {
-    // TODO: get chats from viewmodel
-    val dummy = listOf(
-        Chat(
-            user = User(
-                id = "hoge",
-                name = "atushi"
-            ),
-            message = "こんにちは"
-        ),
-        Chat(
-            user = User(
-                id = "hoge",
-                name = "chigichan24"
-            ),
-            message = "こんにちは、今日はいい天気ですね"
-        ),
-        Chat(
-            user = User(
-                id = "hoge",
-                name = "chigichan24"
-            ),
-            message = "何していますか？"
-        ),
-        Chat(
-            user = User(
-                id = "hoge",
-                name = "atushi"
-            ),
-            message = "今日はおうちハッカソンでチャットアプリを作っています"
-        ),
-        Chat(
-            user = User(
-                id = "hoge",
-                name = "euglena1215"
-            ),
-            message = "こんにちは"
-        )
-    )
+
     Box {
         Column(
             modifier = Modifier.fillMaxHeight(),
