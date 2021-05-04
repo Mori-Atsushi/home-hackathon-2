@@ -9,9 +9,16 @@ type User struct {
 	Name string
 }
 
-func NewUser(name string) User {
+func CreateUser(name string) User {
 	return User{
 		ID:   uuid.Must(uuid.NewRandom()).String(),
+		Name: name,
+	}
+}
+
+func NewUser(id string, name string) User {
+	return User{
+		ID:   id,
 		Name: name,
 	}
 }

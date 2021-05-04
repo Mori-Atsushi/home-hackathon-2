@@ -9,9 +9,9 @@ type UserWithAuth struct {
 	AccessToken string
 }
 
-func NewUserWithAuth(name string) UserWithAuth {
+func CreateUserWithAuth(name string) UserWithAuth {
 	return UserWithAuth{
-		User:        NewUser(name),
+		User:        CreateUser(name),
 		AccessToken: uuid.Must(uuid.NewRandom()).String(),
 	}
 }

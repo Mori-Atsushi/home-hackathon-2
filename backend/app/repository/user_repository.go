@@ -7,6 +7,7 @@ import (
 
 type UserRepository interface {
 	Save(user domain.UserWithAuth) error
+	Get(auth domain.Auth) (domain.User, error)
 }
 
 type UserRepositoryImpl struct {
@@ -35,4 +36,15 @@ func (r *UserRepositoryImpl) Save(user domain.UserWithAuth) error {
 		return err
 	}
 	return nil
+}
+
+func (r *UserRepositoryImpl) Get(auth domain.Auth) (domain.User, error) {
+	var uuid string
+	var name string
+	row := r.db.QueryRow("SELECT uuid, name FROM user WHERE uuid = ? AND access_token = ?", auth.UserID, auth.AccessToken)
+	err := row.Scan(&uuid, &name)
+	if err != nil {
+		return domain.User{}, err
+	}
+	return domain.NewUser(uuid, name), nil
 }

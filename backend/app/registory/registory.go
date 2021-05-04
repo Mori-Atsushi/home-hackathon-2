@@ -10,6 +10,7 @@ import (
 
 type Registory struct {
 	userService service.UserService
+	roomService service.RoomService
 }
 
 func NewRegistory() (*Registory, error) {
@@ -20,13 +21,19 @@ func NewRegistory() (*Registory, error) {
 
 	userRepository := repository.NewUserRepositoryImpl(db)
 	userService := service.NewUserServiceImpl(userRepository)
+	roomService := service.NewRoomServiceImpl(userRepository)
 	return &Registory{
 		userService: userService,
+		roomService: roomService,
 	}, nil
 }
 
 func (r *Registory) GetUserService() service.UserService {
 	return r.userService
+}
+
+func (r *Registory) GetRoomService() service.RoomService {
+	return r.roomService
 }
 
 func setupDB() (*sqlx.DB, error) {
