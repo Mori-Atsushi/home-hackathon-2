@@ -22,7 +22,7 @@ func NewUserServiceImpl(
 }
 
 func (u *UserServiceImpl) Create(name string) (domain.UserWithAuth, error) {
-	user := domain.NewUserWithAuth(name)
+	user := domain.CreateUserWithAuth(name)
 	err := u.repository.Save(user)
 	if err != nil {
 		return domain.UserWithAuth{}, err
