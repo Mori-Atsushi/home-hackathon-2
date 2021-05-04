@@ -4,7 +4,6 @@ import com.example.home_hackathon2.pb.App
 import com.example.home_hackathon2.source.Grpc
 import com.example.home_hackathon2.util.ApplicationScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -18,8 +17,8 @@ class ChatRoomHelper @Inject constructor(
     private val authHelper: AuthHelper,
     private val applicationScope: ApplicationScope
 ) {
-    private val request = MutableSharedFlow<App.ChatRoomEventRequest>(Channel.BUFFERED)
-    private val _response = MutableSharedFlow<App.ChatRoomEventResponse>(Channel.BUFFERED)
+    private val request = MutableSharedFlow<App.ChatRoomEventRequest>(extraBufferCapacity = 64)
+    private val _response = MutableSharedFlow<App.ChatRoomEventResponse>(extraBufferCapacity = 64)
     val response: Flow<App.ChatRoomEventResponse>
         get() = _response
     private var job: Job? = null
