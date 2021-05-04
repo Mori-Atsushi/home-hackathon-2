@@ -1,5 +1,6 @@
 package com.example.home_hackathon2.ui.widget
 
+import androidx.core.graphics.Insets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
@@ -16,19 +17,20 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 
-fun Modifier.paddingTopStatusBar(): Modifier = composed {
+fun Modifier.paddingInsets(
+    top: Boolean = false,
+    start: Boolean = false,
+    end: Boolean = false,
+    bottom: Boolean = false
+): Modifier = composed {
     val view = LocalView.current
-    val density = LocalDensity.current
-    val height = remember {
-        mutableStateOf(0.dp)
+    val state = remember {
+        mutableStateOf(Insets.of(0, 0, 0, 0))
     }
     DisposableEffect(view) {
         val applyCallback = OnApplyWindowInsetsListener { _, insets ->
-            val mask = WindowInsetsCompat.Type.statusBars()
-            val bottom = insets.getInsets(mask).top
-            height.value = density.run {
-                bottom.toDp()
-            }
+            val mask = WindowInsetsCompat.Type.systemBars()
+            state.value = insets.getInsets(mask)
             insets
         }
         ViewCompat.setOnApplyWindowInsetsListener(view, applyCallback)
@@ -36,7 +38,15 @@ fun Modifier.paddingTopStatusBar(): Modifier = composed {
             ViewCompat.setOnApplyWindowInsetsListener(view, null)
         }
     }
-    padding(top = height.value)
+    LocalDensity.current.run {
+        val insets = state.value
+        padding(
+            top = if (top) insets.top.toDp() else 0.dp,
+            start = if (end) insets.right.toDp() else 0.dp,
+            bottom = if (bottom) insets.bottom.toDp() else 0.dp,
+            end = if (start) insets.left.toDp() else 0.dp
+        )
+    }
 }
 
 fun Modifier.paddingBottomIme(): Modifier = composed {
