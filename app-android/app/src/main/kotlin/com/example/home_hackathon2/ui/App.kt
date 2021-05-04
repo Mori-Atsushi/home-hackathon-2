@@ -1,5 +1,6 @@
 package com.example.home_hackathon2.ui
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -12,10 +13,12 @@ fun App() {
         it.getAppViewModel()
     }
     val isVisibleInitialScreen = appViewModel.isVisibleInitialScreen.collectAsState()
-    if (isVisibleInitialScreen.value) {
-        InitialScreen()
-    } else {
-        // TODO: change
-        Text("Hello World")
+    Crossfade(targetState = isVisibleInitialScreen.value) {
+        if (it) {
+            InitialScreen()
+        } else {
+            // TODO: change
+            Text("Hello World")
+        }
     }
 }
