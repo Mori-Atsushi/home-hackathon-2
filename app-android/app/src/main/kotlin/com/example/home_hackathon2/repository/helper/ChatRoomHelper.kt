@@ -1,7 +1,7 @@
 package com.example.home_hackathon2.repository.helper
 
 import com.example.home_hackathon2.pb.App
-import com.example.home_hackathon2.pb.AppServiceGrpcKt
+import com.example.home_hackathon2.source.Grpc
 import com.example.home_hackathon2.util.ApplicationScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -14,7 +14,8 @@ import javax.inject.Singleton
 
 @Singleton
 class ChatRoomHelper @Inject constructor(
-    private val service: AppServiceGrpcKt.AppServiceCoroutineStub,
+    private val grpc: Grpc,
+    private val authHelper: AuthHelper,
     private val applicationScope: ApplicationScope
 ) {
     private val request = MutableSharedFlow<App.ChatRoomEventRequest>(Channel.BUFFERED)
@@ -25,8 +26,9 @@ class ChatRoomHelper @Inject constructor(
 
     fun join() {
         if (job != null) throw IllegalStateException("can not join while joined")
+        val meta = authHelper.getMeta()
         job = applicationScope.launch {
-            service.chatRoomEvent(request).collect {
+            grpc.chatRoomEvent(request, meta).collect {
                 _response.emit(it)
             }
         }
