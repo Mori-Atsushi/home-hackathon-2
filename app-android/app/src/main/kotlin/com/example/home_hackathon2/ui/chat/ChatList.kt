@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,8 +30,11 @@ fun ChatList(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
+    val listState = rememberLazyListState()
+    AutoScrollBottom(items = items, state = listState)
     LazyColumn(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
+        state = listState,
         contentPadding = contentPadding,
     ) {
         items(items) {
@@ -113,6 +119,21 @@ private fun ChatRow(chat: Chat) {
                 fontSize = 11.sp,
                 color = COLOR_DARK
             )
+        }
+    }
+}
+
+@Composable
+private fun AutoScrollBottom(items: List<*>, state: LazyListState) {
+    LaunchedEffect(items) {
+        if (items.isEmpty()) {
+            return@LaunchedEffect
+        }
+        val visibleItemsInfo = state.layoutInfo.visibleItemsInfo
+        val lastIndex = items.lastIndex
+        val isVisibleLast = visibleItemsInfo.firstOrNull { it.index >= lastIndex - 1 } != null
+        if (isVisibleLast) {
+            state.animateScrollToItem(lastIndex)
         }
     }
 }
