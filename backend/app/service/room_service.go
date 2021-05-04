@@ -6,7 +6,11 @@ import (
 )
 
 type RoomService interface {
-	Join(auth domain.Auth) error
+	Join(
+		auth domain.Auth,
+		query <-chan domain.ChatRoomQuery,
+		event chan<- domain.ChatRoomEvent,
+	) error
 }
 
 type RoomServiceImpl struct {
@@ -21,7 +25,11 @@ func NewRoomServiceImpl(
 	}
 }
 
-func (s *RoomServiceImpl) Join(auth domain.Auth) error {
+func (s *RoomServiceImpl) Join(
+	auth domain.Auth,
+	query <-chan domain.ChatRoomQuery,
+	event chan<- domain.ChatRoomEvent,
+) error {
 	_, e := s.userRepository.Get(auth)
 	return e
 }
