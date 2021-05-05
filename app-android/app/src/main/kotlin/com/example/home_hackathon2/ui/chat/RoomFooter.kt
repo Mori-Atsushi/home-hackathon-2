@@ -131,6 +131,10 @@ private fun SpeechRecognizer(
             override fun onBeginningOfSpeech() {
                 viewModel.startSpeech()
             }
+
+            override fun onRmsChanged(rmsdB: Float) {
+                viewModel.changeRms(rmsdB)
+            }
         }
     }
 

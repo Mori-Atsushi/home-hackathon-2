@@ -3,6 +3,8 @@ package com.example.home_hackathon2.ui.chat
 import com.example.home_hackathon2.ui.tools.ViewModel
 import com.example.home_hackathon2.usecase.SendChatUseCase
 import com.example.home_hackathon2.usecase.SendPendingChatUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -10,6 +12,9 @@ class RoomFooterViewModel @Inject constructor(
     private val sendChatUseCase: SendChatUseCase,
     private val sendPendingChatUseCase: SendPendingChatUseCase
 ) : ViewModel() {
+    private val _rmsdB = MutableStateFlow(0F)
+    val rmsdB: StateFlow<Float> = _rmsdB
+
     fun startSpeech() {
         viewModelScope.launch {
             val input = SendPendingChatUseCase.Input.Start
@@ -42,5 +47,9 @@ class RoomFooterViewModel @Inject constructor(
         viewModelScope.launch {
             sendChatUseCase.invoke(message)
         }
+    }
+
+    fun changeRms(rmsdB: Float) {
+        _rmsdB.value = rmsdB
     }
 }
