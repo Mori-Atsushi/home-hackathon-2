@@ -5,7 +5,7 @@ import com.example.home_hackathon2.usecase.SendChatUseCase
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class MicInViewModel @Inject constructor(
+class RoomFooterViewModel @Inject constructor(
     private val sendChatUseCase: SendChatUseCase
 ) : ViewModel() {
     fun send(message: String) {
