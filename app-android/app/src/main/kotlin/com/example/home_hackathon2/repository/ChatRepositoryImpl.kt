@@ -22,6 +22,7 @@ class ChatRepositoryImpl @Inject constructor(
         get() = _myPendingChat
 
     override suspend fun sendMessage(message: String) {
+        _myPendingChat.emit(message)
         val sendChatRequest = App.SendChatRequest
             .newBuilder()
             .setMessage(message)

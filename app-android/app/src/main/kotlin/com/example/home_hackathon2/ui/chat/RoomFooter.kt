@@ -61,9 +61,7 @@ fun RoomFooter() {
         )
     }
     SpeechRecognizer(
-        onRecognized = {
-            viewModel.send(it)
-        }
+        viewModel = viewModel
     )
 }
 
@@ -102,7 +100,7 @@ private fun MicButton(
 
 @Composable
 private fun SpeechRecognizer(
-    onRecognized: (String) -> Unit
+    viewModel: RoomFooterViewModel
 ) {
     val context = LocalContext.current
     val speechRecognizer = remember {
@@ -115,16 +113,23 @@ private fun SpeechRecognizer(
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
             it.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+            it.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
         }
     }
     val callback = remember {
         object : SimpleRecognizerListener.SimpleRecognizerResponseListener {
             override fun onRecognizedResult(speechText: String) {
-                if (speechText.isNotBlank()) {
-                    onRecognized(speechText)
-                }
-                speechRecognizer.stopListening()
+                viewModel.endSpeech(speechText)
+                speechRecognizer.cancel()
                 speechRecognizer.startListening(intent)
+            }
+
+            override fun onPartialResults(speechText: String) {
+                viewModel.partialSpeech(speechText)
+            }
+
+            override fun onBeginningOfSpeech() {
+                viewModel.startSpeech()
             }
         }
     }
@@ -133,6 +138,7 @@ private fun SpeechRecognizer(
         speechRecognizer.setRecognitionListener(SimpleRecognizerListener(callback))
         speechRecognizer.startListening(intent)
         onDispose {
+            viewModel.cancelSpeech()
             speechRecognizer.stopListening()
         }
     }
