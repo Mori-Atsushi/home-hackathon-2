@@ -19,9 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.example.home_hackathon2.R
 import com.example.home_hackathon2.ui.listener.SimpleRecognizerListener
 import com.example.home_hackathon2.ui.res.COLOR_DARK
@@ -35,6 +38,7 @@ fun RoomFooter() {
     val viewModel = rememberViewModel {
         it.getRoomFooterViewModel()
     }
+    val lifecycleOwner = LocalLifecycleOwner.current
     val volume = viewModel.volume.collectAsState()
     val sizeDp = remember(volume.value) {
         lerp(60.dp, 70.dp, volume.value)
@@ -42,6 +46,21 @@ fun RoomFooter() {
     val innerSize = animateDpAsState(targetValue = sizeDp)
     val outerSize = remember(innerSize.value) {
         innerSize.value + 2.dp
+    }
+    DisposableEffect(lifecycleOwner) {
+        val observer = object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                viewModel.onForeground()
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                viewModel.onBackground()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
     Box(
         modifier = Modifier.height(56.dp)
