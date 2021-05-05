@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +38,8 @@ fun Chat(myPartialMessage: String) {
     Chat(
         isMe = true,
         name = "自分",
-        message = myPartialMessage
+        message = myPartialMessage,
+        alpha = 0.5F
     )
 }
 
@@ -57,10 +59,11 @@ fun Chat(chat: Chat) {
 
 
 @Composable
-fun Chat(
+private fun Chat(
     isMe: Boolean,
     name: String,
-    message: String
+    message: String,
+    alpha: Float = 1.0F
 ) {
     val alignment = if (isMe) {
         Alignment.End
@@ -99,6 +102,7 @@ fun Chat(
             Text(
                 modifier = Modifier
                     .clip(shape = shape)
+                    .alpha(alpha)
                     .background(color = backgroundColor)
                     .padding(all = 8.dp),
                 text = message,
