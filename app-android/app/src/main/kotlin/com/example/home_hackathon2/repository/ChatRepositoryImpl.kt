@@ -5,9 +5,7 @@ import com.example.home_hackathon2.pb.App
 import com.example.home_hackathon2.repository.helper.ChatRoomHelper
 import com.example.home_hackathon2.repository.mapper.toModel
 import com.example.home_hackathon2.source.Preferences
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
@@ -19,7 +17,12 @@ class ChatRepositoryImpl @Inject constructor(
             .filter { it.hasChatRecieveResponse() }
             .map { toModel(it.chatRecieveResponse) }
 
+    private val _myPendingChat = MutableSharedFlow<String?>()
+    override val myPendingMessage: Flow<String?>
+        get() = _myPendingChat
+
     override suspend fun sendMessage(message: String) {
+        _myPendingChat.emit(message)
         val sendChatRequest = App.SendChatRequest
             .newBuilder()
             .setMessage(message)
@@ -28,6 +31,10 @@ class ChatRepositoryImpl @Inject constructor(
             .setSendChatRequest(sendChatRequest)
             .build()
         chatRoomHelper.send(eventRequest)
+    }
+
+    override suspend fun setPendingMessage(message: String?) {
+        _myPendingChat.emit(message)
     }
 
     private fun toModel(response: App.ChatReceiveResponse): Chat {

@@ -49,13 +49,13 @@ private fun MainContent(
 ) {
     Crossfade(
         modifier = modifier,
-        targetState = chatRoom.items.isEmpty()
+        targetState = chatRoom.isEmpty()
     ) {
         if (it) {
             Empty()
         } else {
             ChatList(
-                items = chatRoom.items,
+                data = chatRoom,
                 contentPadding = PaddingValues(top = 12.dp, bottom = 30.dp)
             )
         }

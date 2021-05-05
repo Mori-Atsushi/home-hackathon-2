@@ -19,6 +19,11 @@ class ObserveChatRoomUseCaseImpl @Inject constructor(
                 flow.value = flow.value.added(it)
             }
         }
+        scope.launch {
+            chatRepository.myPendingMessage.collect {
+                flow.value = flow.value.addedPendingChat(it)
+            }
+        }
         return flow
     }
 }

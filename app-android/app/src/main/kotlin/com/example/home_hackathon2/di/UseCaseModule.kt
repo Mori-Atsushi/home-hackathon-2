@@ -39,4 +39,9 @@ abstract class UseCaseModule {
     abstract fun bindSendChatUseCase(
         impl: SendChatUseCaseImpl
     ): SendChatUseCase
+
+    @Binds
+    abstract fun bindSendPendingChatUseCase(
+        impl: SendPendingChatUseCaseImpl
+    ): SendPendingChatUseCase
 }
