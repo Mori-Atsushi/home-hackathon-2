@@ -1,15 +1,22 @@
 package com.example.home_hackathon2.ui.initial
 
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.home_hackathon2.ui.res.COLOR_BLACK
 import com.example.home_hackathon2.ui.res.COLOR_DARK
 import com.example.home_hackathon2.ui.res.COLOR_LIGHT
@@ -21,6 +28,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 fun InitialScreen() {
     val viewModel = rememberViewModel {
         it.getInitialViewModel()
+    }
+    val context = LocalContext.current
+    LaunchedEffect(true) {
+        requestMicPermission(context)
     }
     Box(
         modifier = Modifier
@@ -97,4 +108,18 @@ private fun NameTextField(
             hint = "名前を入力する"
         )
     }
+}
+
+fun requestMicPermission(context: Context) {
+    if (!hasPermissions(context)) {
+        ActivityCompat.requestPermissions(
+            context as Activity,
+            arrayOf(Manifest.permission.RECORD_AUDIO),
+            1
+        )
+    }
+}
+
+fun hasPermissions(context: Context) = arrayOf(Manifest.permission.RECORD_AUDIO).all {
+    ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
 }
