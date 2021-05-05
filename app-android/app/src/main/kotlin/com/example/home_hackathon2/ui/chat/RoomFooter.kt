@@ -3,7 +3,6 @@ package com.example.home_hackathon2.ui.chat
 import android.content.Intent
 import android.speech.RecognizerIntent
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,7 +29,6 @@ import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.res.COLOR_PRIMARY
 import com.example.home_hackathon2.ui.res.COLOR_WHITE
 import com.example.home_hackathon2.ui.tools.rememberViewModel
-import kotlinx.coroutines.flow.map
 
 @Composable
 fun RoomFooter() {
@@ -69,7 +67,8 @@ fun RoomFooter() {
                 .align(Alignment.Center)
                 .offset(y = (-28).dp)
                 .requiredWidth(innerSize.value)
-                .requiredHeight(innerSize.value)
+                .requiredHeight(innerSize.value),
+            onClick = viewModel::switchIsMute
         )
     }
     SpeechRecognizer(
@@ -80,7 +79,8 @@ fun RoomFooter() {
 @Preview
 @Composable
 private fun MicButton(
-    modifier: Modifier = Modifier
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
@@ -89,7 +89,7 @@ private fun MicButton(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(),
-                onClick = {}
+                onClick = onClick
             )
             .border(2.dp, COLOR_PRIMARY, CircleShape)
     ) {
@@ -131,7 +131,9 @@ private fun SpeechRecognizer(
             override fun onRecognizedResult(speechText: String) {
                 viewModel.endSpeech(speechText)
                 speechRecognizer.cancel()
-                speechRecognizer.startListening(intent)
+                if (!viewModel.isMuted.value) {
+                    speechRecognizer.startListening(intent)
+                }
             }
 
             override fun onPartialResults(speechText: String) {
@@ -147,13 +149,20 @@ private fun SpeechRecognizer(
             }
         }
     }
+    val isMuted = viewModel.isMuted.collectAsState().value
 
-    DisposableEffect(true) {
-        speechRecognizer.setRecognitionListener(SimpleRecognizerListener(callback))
-        speechRecognizer.startListening(intent)
-        onDispose {
-            viewModel.cancelSpeech()
+    DisposableEffect(isMuted) {
+        if (isMuted) {
             speechRecognizer.stopListening()
+        } else {
+            speechRecognizer.setRecognitionListener(SimpleRecognizerListener(callback))
+            speechRecognizer.startListening(intent)
+        }
+        onDispose {
+            if (!isMuted) {
+                viewModel.cancelSpeech()
+                speechRecognizer.stopListening()
+            }
         }
     }
 }

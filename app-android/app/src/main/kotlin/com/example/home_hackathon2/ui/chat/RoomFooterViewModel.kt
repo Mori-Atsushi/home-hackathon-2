@@ -19,6 +19,9 @@ class RoomFooterViewModel @Inject constructor(
     private val _volume = MutableStateFlow(0F)
     val volume: StateFlow<Float> = _volume
 
+    private val _isMuted = MutableStateFlow(false)
+    val isMuted: StateFlow<Boolean> = _isMuted
+
     fun startSpeech() {
         viewModelScope.launch {
             val input = SendPendingChatUseCase.Input.Start
@@ -59,5 +62,9 @@ class RoomFooterViewModel @Inject constructor(
             rmsdB < MAX_RMS_DB -> rmsdB
             else -> MAX_RMS_DB
         } / MAX_RMS_DB
+    }
+
+    fun switchIsMute() {
+        _isMuted.value = !_isMuted.value
     }
 }
