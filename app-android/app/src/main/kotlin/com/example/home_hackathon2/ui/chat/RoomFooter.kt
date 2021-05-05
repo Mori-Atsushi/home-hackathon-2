@@ -109,12 +109,14 @@ private fun SpeechRecognizer(
         android.speech.SpeechRecognizer.createSpeechRecognizer(context)
     }
     val intent = remember {
-        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).also {
+            it.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            it.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+        }
     }
-    intent.putExtra(
-        RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-    )
     val callback = remember {
         object : SimpleRecognizerListener.SimpleRecognizerResponseListener {
             override fun onRecognizedResult(speechText: String) {
