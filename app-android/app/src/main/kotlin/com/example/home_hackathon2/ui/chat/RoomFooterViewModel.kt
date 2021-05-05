@@ -12,8 +12,12 @@ class RoomFooterViewModel @Inject constructor(
     private val sendChatUseCase: SendChatUseCase,
     private val sendPendingChatUseCase: SendPendingChatUseCase
 ) : ViewModel() {
-    private val _rmsdB = MutableStateFlow(0F)
-    val rmsdB: StateFlow<Float> = _rmsdB
+    companion object {
+        const val MAX_RMS_DB = 10F
+    }
+
+    private val _volume = MutableStateFlow(0F)
+    val volume: StateFlow<Float> = _volume
 
     fun startSpeech() {
         viewModelScope.launch {
@@ -50,6 +54,10 @@ class RoomFooterViewModel @Inject constructor(
     }
 
     fun changeRms(rmsdB: Float) {
-        _rmsdB.value = rmsdB
+        _volume.value = when {
+            rmsdB < 0F -> 0F
+            rmsdB < MAX_RMS_DB -> rmsdB
+            else -> MAX_RMS_DB
+        } / MAX_RMS_DB
     }
 }
