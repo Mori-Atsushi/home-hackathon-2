@@ -1,5 +1,6 @@
 package com.example.home_hackathon2.ui.chat
 
+import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
@@ -7,6 +8,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -16,6 +19,7 @@ import com.example.home_hackathon2.R
 import com.example.home_hackathon2.model.ChatRoom
 import com.example.home_hackathon2.ui.res.*
 import com.example.home_hackathon2.ui.tools.rememberViewModel
+import com.example.home_hackathon2.ui.widget.LocalWindow
 import com.example.home_hackathon2.ui.widget.paddingInsets
 
 @Composable
@@ -23,7 +27,15 @@ fun ChatRoomScreen() {
     val viewModel = rememberViewModel {
         it.getChatRoomViewModel()
     }
+    val window = LocalWindow.current
     val chatRoom = viewModel.chatRoom.collectAsState()
+    // 画面を暗くしない
+    DisposableEffect(window) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        onDispose {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+    }
     Box(
         modifier = Modifier
             .paddingInsets(top = true, bottom = true)
