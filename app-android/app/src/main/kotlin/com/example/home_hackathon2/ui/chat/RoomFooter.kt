@@ -20,11 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.example.home_hackathon2.R
 import com.example.home_hackathon2.ui.listener.SimpleRecognizerListener
+import com.example.home_hackathon2.ui.res.COLOR_DARK
 import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.res.COLOR_PRIMARY
 import com.example.home_hackathon2.ui.res.COLOR_WHITE
@@ -68,7 +68,8 @@ fun RoomFooter() {
                 .offset(y = (-28).dp)
                 .requiredWidth(innerSize.value)
                 .requiredHeight(innerSize.value),
-            onClick = viewModel::switchIsMute
+            onClick = viewModel::switchIsMute,
+            isMuted = viewModel.isMuted.collectAsState().value
         )
     }
     SpeechRecognizer(
@@ -76,12 +77,17 @@ fun RoomFooter() {
     )
 }
 
-@Preview
 @Composable
 private fun MicButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isMuted: Boolean = false
 ) {
+    val color = if (isMuted) {
+        COLOR_DARK
+    } else {
+        COLOR_PRIMARY
+    }
     Box(
         modifier = modifier
             .clip(CircleShape)
@@ -91,14 +97,14 @@ private fun MicButton(
                 indication = rememberRipple(),
                 onClick = onClick
             )
-            .border(2.dp, COLOR_PRIMARY, CircleShape)
+            .border(2.dp, color, CircleShape)
     ) {
         Icon(
             modifier = Modifier
                 .clip(CircleShape)
                 .width(52.dp)
                 .height(52.dp)
-                .background(color = COLOR_PRIMARY)
+                .background(color = color)
                 .padding(10.dp)
                 .align(Alignment.Center),
             painter = painterResource(id = R.drawable.ic_microphone_solid),
