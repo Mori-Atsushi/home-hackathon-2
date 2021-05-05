@@ -30,7 +30,7 @@ private fun Chat() {
         message = "message",
         isMe = true
     )
-    Chat(chat = chat)
+    Chat(chat = chat, isBottomSame = true)
 }
 
 @Composable
@@ -44,7 +44,10 @@ fun Chat(myPartialMessage: String) {
 }
 
 @Composable
-fun Chat(chat: Chat) {
+fun Chat(
+    chat: Chat,
+    isBottomSame: Boolean = false
+) {
     val name = if (chat.isMe) {
         "自分"
     } else {
@@ -53,7 +56,8 @@ fun Chat(chat: Chat) {
     Chat(
         isMe = chat.isMe,
         name = name,
-        message = chat.message
+        message = chat.message,
+        isBottomSame = isBottomSame
     )
 }
 
@@ -63,6 +67,7 @@ private fun Chat(
     isMe: Boolean,
     name: String,
     message: String,
+    isBottomSame: Boolean = false,
     alpha: Float = 1.0F
 ) {
     val alignment = if (isMe) {
@@ -95,7 +100,7 @@ private fun Chat(
                 .fillMaxWidth(0.8F)
                 .padding(
                     horizontal = 16.dp,
-                    vertical = 6.dp
+                    vertical = 2.dp
                 ),
             horizontalAlignment = alignment
         ) {
@@ -109,12 +114,14 @@ private fun Chat(
                 fontSize = 14.sp,
                 color = color
             )
-            Text(
-                modifier = Modifier.padding(top = 4.dp),
-                text = name,
-                fontSize = 11.sp,
-                color = COLOR_DARK
-            )
+            if (!isBottomSame) {
+                Text(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    text = name,
+                    fontSize = 11.sp,
+                    color = COLOR_DARK
+                )
+            }
         }
     }
 }

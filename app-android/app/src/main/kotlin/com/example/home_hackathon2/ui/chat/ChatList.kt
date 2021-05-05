@@ -1,10 +1,7 @@
 package com.example.home_hackathon2.ui.chat
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -26,10 +23,19 @@ fun ChatList(
         state = listState,
         contentPadding = contentPadding,
     ) {
-        items(data.items) {
+        itemsIndexed(data.items) { index, it ->
             when (it) {
                 is ChatRoomItem.Chat -> {
-                    Chat(chat = it.value)
+                    val isBottomSame = if (index < data.items.lastIndex) {
+                        val next = data.items[index + 1]
+                        next is ChatRoomItem.Chat && it.value.user.id == next.value.user.id
+                    } else {
+                        it.value.isMe && data.myPendingChat != null
+                    }
+                    Chat(
+                        chat = it.value,
+                        isBottomSame = isBottomSame
+                    )
                 }
             }
         }
