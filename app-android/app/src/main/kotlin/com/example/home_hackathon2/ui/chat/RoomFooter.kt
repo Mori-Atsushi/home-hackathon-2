@@ -3,7 +3,6 @@ package com.example.home_hackathon2.ui.chat
 import android.content.Intent
 import android.speech.RecognizerIntent
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,23 +19,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.example.home_hackathon2.R
 import com.example.home_hackathon2.ui.listener.SimpleRecognizerListener
+import com.example.home_hackathon2.ui.res.COLOR_DARK
 import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.res.COLOR_PRIMARY
 import com.example.home_hackathon2.ui.res.COLOR_WHITE
 import com.example.home_hackathon2.ui.tools.rememberViewModel
-import kotlinx.coroutines.flow.map
 
 @Composable
 fun RoomFooter() {
     val viewModel = rememberViewModel {
         it.getRoomFooterViewModel()
     }
+    val lifecycleOwner = LocalLifecycleOwner.current
     val volume = viewModel.volume.collectAsState()
     val sizeDp = remember(volume.value) {
         lerp(60.dp, 70.dp, volume.value)
@@ -44,6 +46,21 @@ fun RoomFooter() {
     val innerSize = animateDpAsState(targetValue = sizeDp)
     val outerSize = remember(innerSize.value) {
         innerSize.value + 2.dp
+    }
+    DisposableEffect(lifecycleOwner) {
+        val observer = object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                viewModel.onForeground()
+            }
+
+            override fun onStop(owner: LifecycleOwner) {
+                viewModel.onBackground()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
     Box(
         modifier = Modifier.height(56.dp)
@@ -69,7 +86,9 @@ fun RoomFooter() {
                 .align(Alignment.Center)
                 .offset(y = (-28).dp)
                 .requiredWidth(innerSize.value)
-                .requiredHeight(innerSize.value)
+                .requiredHeight(innerSize.value),
+            onClick = viewModel::switchIsMute,
+            isMuted = viewModel.isMuted.collectAsState().value
         )
     }
     SpeechRecognizer(
@@ -77,11 +96,17 @@ fun RoomFooter() {
     )
 }
 
-@Preview
 @Composable
 private fun MicButton(
-    modifier: Modifier = Modifier
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isMuted: Boolean = false
 ) {
+    val color = if (isMuted) {
+        COLOR_DARK
+    } else {
+        COLOR_PRIMARY
+    }
     Box(
         modifier = modifier
             .clip(CircleShape)
@@ -89,16 +114,16 @@ private fun MicButton(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(),
-                onClick = {}
+                onClick = onClick
             )
-            .border(2.dp, COLOR_PRIMARY, CircleShape)
+            .border(2.dp, color, CircleShape)
     ) {
         Icon(
             modifier = Modifier
                 .clip(CircleShape)
                 .width(52.dp)
                 .height(52.dp)
-                .background(color = COLOR_PRIMARY)
+                .background(color = color)
                 .padding(10.dp)
                 .align(Alignment.Center),
             painter = painterResource(id = R.drawable.ic_microphone_solid),
@@ -131,7 +156,9 @@ private fun SpeechRecognizer(
             override fun onRecognizedResult(speechText: String) {
                 viewModel.endSpeech(speechText)
                 speechRecognizer.cancel()
-                speechRecognizer.startListening(intent)
+                if (!viewModel.isMuted.value) {
+                    speechRecognizer.startListening(intent)
+                }
             }
 
             override fun onPartialResults(speechText: String) {
@@ -147,13 +174,20 @@ private fun SpeechRecognizer(
             }
         }
     }
+    val isMuted = viewModel.isMuted.collectAsState().value
 
-    DisposableEffect(true) {
-        speechRecognizer.setRecognitionListener(SimpleRecognizerListener(callback))
-        speechRecognizer.startListening(intent)
-        onDispose {
-            viewModel.cancelSpeech()
+    DisposableEffect(isMuted) {
+        if (isMuted) {
             speechRecognizer.stopListening()
+        } else {
+            speechRecognizer.setRecognitionListener(SimpleRecognizerListener(callback))
+            speechRecognizer.startListening(intent)
+        }
+        onDispose {
+            if (!isMuted) {
+                viewModel.cancelSpeech()
+                speechRecognizer.stopListening()
+            }
         }
     }
 }

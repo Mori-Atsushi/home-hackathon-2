@@ -60,6 +60,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3")
     implementation("androidx.preference:preference-ktx:1.1.1")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.3.1")
 
     implementation("androidx.compose.ui:ui:1.0.0-beta05")
     implementation("androidx.compose.ui:ui-tooling:1.0.0-beta05")
