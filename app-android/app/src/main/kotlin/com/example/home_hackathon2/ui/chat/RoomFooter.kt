@@ -2,6 +2,8 @@ package com.example.home_hackathon2.ui.chat
 
 import android.content.Intent
 import android.speech.RecognizerIntent
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,16 +37,20 @@ fun RoomFooter() {
     val viewModel = rememberViewModel {
         it.getRoomFooterViewModel()
     }
-    val innerSize = viewModel.volume.map {
-        lerp(60.dp, 70.dp, it)
-    }.collectAsState(initial = 60.dp).value
-    val outerSize = innerSize + 2.dp
+    val volume = viewModel.volume.collectAsState()
+    val sizeDp = remember(volume.value) {
+        lerp(60.dp, 70.dp, volume.value)
+    }
+    val innerSize = animateDpAsState(targetValue = sizeDp)
+    val outerSize = remember(innerSize.value) {
+        innerSize.value + 2.dp
+    }
     Box(
         modifier = Modifier.height(56.dp)
     ) {
         Box(
             modifier = Modifier
-                .offset(y = (-20).dp)
+                .offset(y = (-28).dp)
                 .requiredWidth(outerSize)
                 .requiredHeight(outerSize)
                 .clip(CircleShape)
@@ -61,9 +67,9 @@ fun RoomFooter() {
         MicButton(
             modifier = Modifier
                 .align(Alignment.Center)
-                .offset(y = (-20).dp)
-                .requiredWidth(innerSize)
-                .requiredHeight(innerSize)
+                .offset(y = (-28).dp)
+                .requiredWidth(innerSize.value)
+                .requiredHeight(innerSize.value)
         )
     }
     SpeechRecognizer(
