@@ -12,7 +12,7 @@ class SendPendingChatUseCaseImpl @Inject constructor(
             val value = when (input) {
                 SendPendingChatUseCase.Input.Cancel -> null
                 is SendPendingChatUseCase.Input.Message -> input.value
-                SendPendingChatUseCase.Input.Start -> "..."
+                SendPendingChatUseCase.Input.Start -> "......"
             }
             chatRepository.setPendingMessage(value)
         }
