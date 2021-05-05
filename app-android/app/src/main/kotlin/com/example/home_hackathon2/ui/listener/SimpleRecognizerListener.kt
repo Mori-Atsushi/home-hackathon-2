@@ -13,6 +13,7 @@ class SimpleRecognizerListener(
         fun onBeginningOfSpeech()
         fun onRecognizedResult(speechText: String)
         fun onPartialResults(speechText: String)
+        fun onRmsChanged(rmsdB: Float)
     }
 
     override fun onReadyForSpeech(p0: Bundle?) {
@@ -20,6 +21,7 @@ class SimpleRecognizerListener(
     }
 
     override fun onRmsChanged(p0: Float) {
+        listener.onRmsChanged(p0)
     }
 
     override fun onBufferReceived(p0: ByteArray?) {

@@ -2,6 +2,8 @@ package com.example.home_hackathon2.ui.chat
 
 import android.content.Intent
 import android.speech.RecognizerIntent
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,6 +14,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,30 +23,39 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import com.example.home_hackathon2.R
 import com.example.home_hackathon2.ui.listener.SimpleRecognizerListener
 import com.example.home_hackathon2.ui.res.COLOR_LIGHT
 import com.example.home_hackathon2.ui.res.COLOR_PRIMARY
 import com.example.home_hackathon2.ui.res.COLOR_WHITE
 import com.example.home_hackathon2.ui.tools.rememberViewModel
+import kotlinx.coroutines.flow.map
 
-@Preview
 @Composable
 fun RoomFooter() {
     val viewModel = rememberViewModel {
         it.getRoomFooterViewModel()
+    }
+    val volume = viewModel.volume.collectAsState()
+    val sizeDp = remember(volume.value) {
+        lerp(60.dp, 70.dp, volume.value)
+    }
+    val innerSize = animateDpAsState(targetValue = sizeDp)
+    val outerSize = remember(innerSize.value) {
+        innerSize.value + 2.dp
     }
     Box(
         modifier = Modifier.height(56.dp)
     ) {
         Box(
             modifier = Modifier
-                .offset(y = (-30).dp)
-                .requiredWidth(62.dp)
-                .requiredHeight(62.dp)
+                .offset(y = (-28).dp)
+                .requiredWidth(outerSize)
+                .requiredHeight(outerSize)
                 .clip(CircleShape)
                 .background(COLOR_LIGHT)
-                .align(Alignment.TopCenter)
+                .align(Alignment.Center)
         )
         Spacer(
             modifier = Modifier
@@ -54,10 +66,10 @@ fun RoomFooter() {
         )
         MicButton(
             modifier = Modifier
-                .offset(y = (-30).dp)
-                .requiredWidth(60.dp)
-                .requiredHeight(60.dp)
-                .align(Alignment.TopCenter)
+                .align(Alignment.Center)
+                .offset(y = (-28).dp)
+                .requiredWidth(innerSize.value)
+                .requiredHeight(innerSize.value)
         )
     }
     SpeechRecognizer(
@@ -73,8 +85,6 @@ private fun MicButton(
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .width(60.dp)
-            .height(60.dp)
             .background(COLOR_WHITE)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -130,6 +140,10 @@ private fun SpeechRecognizer(
 
             override fun onBeginningOfSpeech() {
                 viewModel.startSpeech()
+            }
+
+            override fun onRmsChanged(rmsdB: Float) {
+                viewModel.changeRms(rmsdB)
             }
         }
     }
